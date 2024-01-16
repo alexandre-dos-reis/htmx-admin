@@ -25,26 +25,20 @@ export const customers = new Elysia({ prefix: "/customers" })
   .use(decorateRequest)
   .all("/", async () => {
     const { renderList } = await createList({
-      loadData: ({ getCustomers }, { sort, pagination: { currentPage } }) => {
-        // TODO: use a real data provider like prisma, grpahql, etc...
-        const customers = getCustomers();
-        const sliced = customers.slice(0 * currentPage, 9 * currentPage);
-
-        return {
-          data: sort
-            ? sliced.sort((a, b) => {
-                if (sort.byDirection === "desc") {
-                  return a[sort.byName] > b[sort.byName] ? 1 : -1;
-                } else {
-                  return a[sort.byName] < b[sort.byName] ? 0 : -1;
-                }
-              })
-            : sliced,
-          totalRows: customers.length,
-          currentPage: currentPage || 1,
-        };
+      loadData: async ({ db }, { sort, pagination: { currentPage } }) => {
+        const [data, count] = await db.$transaction([
+          db.customer.findMany({
+            take: 10,
+            skip: currentPage * (currentPage - 1),
+            orderBy: { [sort?.byName]: sort?.byDirection },
+          }),
+          db.customer.count({
+            orderBy: { [sort?.byName]: sort?.byDirection },
+          }),
+        ]);
+        return { data, totalRows: count };
       },
-      rowClickHref: (data) => `/customers/${data.name}`,
+      rowClickHref: (data) => `/customers/${data.id}`,
       columns: {
         name: {
           label: "Name",

@@ -44,3 +44,6 @@ package-lock.json
 # assets
 public/assets/*
 !.gitkeep
+
+# sqlite
+*.db

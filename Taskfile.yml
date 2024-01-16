@@ -34,3 +34,15 @@ tasks:
   vite:build:
     cmds:
       - bunx --bun vite build --emptyOutDir
+
+  db:create-migration:
+    cmds:
+      - bunx prisma migrate dev --name
+
+  prisma:generate:
+    cmds:
+      - bunx prisma generate
+
+  prisma:studio:
+    cmds:
+      - bunx prisma studio
