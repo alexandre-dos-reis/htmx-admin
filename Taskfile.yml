@@ -1,0 +1,36 @@
+version: 3
+
+silent: true
+
+vars:
+  CSS_INPUT: ./src/index.css
+  CSS_OUTPUT: ./public/assets/css/index.css
+  SERVER_PORT: 3100
+  VITE_PORT: 3200
+
+tasks:
+  dev:
+    deps: ["vite:dev", "bun:dev", "assets:watch"]
+
+  build:
+    deps: []
+
+  assets:watch:
+    cmds:
+      - bunx postcss {{.CSS_INPUT}} --output {{.CSS_OUTPUT}} --watch
+
+  assets:build:
+    cmds:
+      - bunx postcss {{.CSS_INPUT}} --output {{.CSS_OUTPUT}} --minify
+
+  bun:dev:
+    cmds:
+      - APP_ENV="development" PORT={{.SERVER_PORT}} VITE_PORT={{.VITE_PORT}} bun run --watch src/index.tsx
+
+  vite:dev:
+    cmds:
+      - bunx --bun vite --port {{.VITE_PORT}}
+
+  vite:build:
+    cmds:
+      - bunx --bun vite build --emptyOutDir
