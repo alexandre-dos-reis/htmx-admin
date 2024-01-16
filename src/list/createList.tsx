@@ -3,6 +3,7 @@ import { ContextDecorated } from "~/config/decorateRequest";
 import { globalContext } from "~/config/globalStorages";
 import { cn, isObjectEmpty } from "~/utils";
 import { z } from "zod";
+import { parse } from "url";
 
 type ColumnDef<T> = {
   label?: string;
@@ -14,7 +15,7 @@ const orderByDirectionSchema = z.union([z.literal("asc"), z.literal("desc")]);
 
 type MaybePromise<T> = T | Promise<T>;
 
-type DataConfig<T extends Array<Record<string, any>>> = { data: T; totalRows: number; currentPage?: number };
+type LoadDataConfig<T extends Array<Record<string, any>>> = { data: T; totalRows: number };
 
 export const createList = async <
   TDatas extends Array<Record<string | number | symbol, any>>,
@@ -33,14 +34,15 @@ export const createList = async <
       sort?: { byName: TColumnsKeys; byDirection: z.infer<typeof orderByDirectionSchema> };
       pagination: { currentPage: number };
     },
-  ) => MaybePromise<DataConfig<TDatas>>;
+  ) => MaybePromise<LoadDataConfig<TDatas>>;
   pagination?: {
     rowsPerPage?: number;
   };
   rowClickHref?: (arg: TRow) => string;
 }) => {
-  let dataConfig: DataConfig<TDatas>;
+  let dataConfig: LoadDataConfig<TDatas>;
   const context = globalContext.getStore() as NonNullable<ContextDecorated>;
+  let currentPage = 1;
 
   if (!isObjectEmpty(context.query)) {
     const parsed = z
@@ -58,31 +60,31 @@ export const createList = async <
         page: context.query["page"],
       });
 
+    currentPage = parsed.success ? parsed.data.page ?? 1 : 1;
+
     dataConfig = await Promise.resolve(
       loadData(
         context,
         parsed.success
           ? {
-              sort: { byDirection: parsed.data.byDirection, byName: parsed.data.byName as TColumnsKeys },
-              pagination: { currentPage: parsed.data.page },
+              sort: { byDirection: parsed.data.byDirection || "desc", byName: parsed.data.byName as TColumnsKeys },
+              pagination: { currentPage },
             }
-          : { sort: undefined, pagination: 1 },
+          : { sort: undefined, pagination: { currentPage } },
       ),
-    ).then((v) => v);
+    );
   } else {
-    dataConfig = await Promise.resolve(loadData(context, { pagination: { currentPage: 1 } })).then((v) => v);
+    dataConfig = await Promise.resolve(loadData(context, { pagination: { currentPage } }));
   }
 
   const rowsPerPage = pagination?.rowsPerPage ?? 10;
   const totalPages = Math.ceil(dataConfig.totalRows / rowsPerPage);
 
-  // console.log({ dataConfig, totalPages, rowsPerPage });
-
   return {
     renderList: () => (
       <List
         totalPages={totalPages}
-        currentPage={dataConfig.currentPage || 1}
+        currentPage={currentPage}
         headers={Object.keys(columns).map((keyofCol) => ({
           queryName: keyofCol,
           // @ts-ignore
