@@ -21,22 +21,25 @@ const CustomersTabs = (p: JSX.ElementChildrenAttribute) => {
   return <Tabs tabs={tabs}>{p.children}</Tabs>;
 };
 
+const ROWS_PER_PAGE = 10;
+
 export const customers = new Elysia({ prefix: "/customers" })
   .use(decorateRequest)
   .all("/", async () => {
     const { renderList } = await createList({
+      pagination: { rowsPerPage: ROWS_PER_PAGE },
       loadData: async ({ db }, { sort, pagination: { currentPage } }) => {
-        const [data, count] = await db.$transaction([
+        const [data, totalRows] = await db.$transaction([
           db.customer.findMany({
             take: 10,
-            skip: currentPage * (currentPage - 1),
+            skip: ROWS_PER_PAGE * (currentPage - 1),
             orderBy: { [sort?.byName]: sort?.byDirection },
           }),
           db.customer.count({
             orderBy: { [sort?.byName]: sort?.byDirection },
           }),
         ]);
-        return { data, totalRows: count };
+        return { data, totalRows };
       },
       rowClickHref: (data) => `/customers/${data.id}`,
       columns: {

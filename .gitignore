@@ -47,3 +47,4 @@ public/assets/*
 
 # sqlite
 *.db
+*.db-journal
