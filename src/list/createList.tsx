@@ -3,7 +3,6 @@ import { ContextDecorated } from "~/config/decorateRequest";
 import { globalContext } from "~/config/globalStorages";
 import { cn, isObjectEmpty } from "~/utils";
 import { z } from "zod";
-import { parse } from "url";
 
 type ColumnDef<T> = {
   label?: string;
@@ -25,17 +24,17 @@ export const createList = async <
   columns,
   loadData,
   rowClickHref,
-  pagination,
+  config,
 }: {
   columns: Partial<Record<keyof TRow, ColumnDef<TRow>>>;
   loadData: (
     ctx: ContextDecorated,
     state: {
       sort?: { byName: TColumnsKeys; byDirection: z.infer<typeof orderByDirectionSchema> };
-      pagination: { currentPage: number };
+      pagination: { currentPage: number; rowsPerPage: number };
     },
   ) => MaybePromise<LoadDataConfig<TDatas>>;
-  pagination?: {
+  config?: {
     rowsPerPage?: number;
   };
   rowClickHref?: (arg: TRow) => string;
@@ -43,6 +42,7 @@ export const createList = async <
   let dataConfig: LoadDataConfig<TDatas>;
   const context = globalContext.getStore() as NonNullable<ContextDecorated>;
   let currentPage = 1;
+  const rowsPerPage = config?.rowsPerPage ?? 10;
 
   if (!isObjectEmpty(context.query)) {
     const parsed = z
@@ -68,16 +68,15 @@ export const createList = async <
         parsed.success
           ? {
               sort: { byDirection: parsed.data.byDirection || "desc", byName: parsed.data.byName as TColumnsKeys },
-              pagination: { currentPage },
+              pagination: { currentPage, rowsPerPage },
             }
-          : { sort: undefined, pagination: { currentPage } },
+          : { sort: undefined, pagination: { currentPage, rowsPerPage } },
       ),
     );
   } else {
-    dataConfig = await Promise.resolve(loadData(context, { pagination: { currentPage } }));
+    dataConfig = await Promise.resolve(loadData(context, { pagination: { currentPage, rowsPerPage } }));
   }
 
-  const rowsPerPage = pagination?.rowsPerPage ?? 10;
   const totalPages = Math.ceil(dataConfig.totalRows / rowsPerPage);
 
   return {
