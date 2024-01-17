@@ -24,6 +24,7 @@ export const customers = new Elysia({ prefix: "/customers" })
   .use(decorateRequest)
   .all("/", async () => {
     const { renderList } = await createList({
+      config: { defaultSorting: { byDirection: "asc", byName: "name" } },
       loadData: async ({ db }, { sort, pagination: { currentPage, rowsPerPage } }) => {
         const orderBy = sort ? { [sort?.byName]: sort?.byDirection } : undefined;
         const [data, totalRows] = await db.$transaction([

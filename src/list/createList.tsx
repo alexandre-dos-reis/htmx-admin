@@ -12,6 +12,7 @@ type ColumnDef<T> = {
 };
 
 const orderByDirectionSchema = z.union([z.literal("asc"), z.literal("desc")]);
+type SortByDirection = z.infer<typeof orderByDirectionSchema>;
 
 type LoadDataConfig<T extends Array<Record<string, any>>> = { data: T; totalRows: number };
 
@@ -29,12 +30,16 @@ export const createList = async <
   loadData: (
     ctx: ContextDecorated,
     state: {
-      sort?: { byName: TColumnsKeys; byDirection: z.infer<typeof orderByDirectionSchema> };
+      sort?: { byName: TColumnsKeys; byDirection: SortByDirection };
       pagination: { currentPage: number; rowsPerPage: number };
     },
   ) => MaybePromise<LoadDataConfig<TDatas>>;
   config?: {
     rowsPerPage?: number;
+    defaultSorting?: {
+      byName: TColumnsKeys;
+      byDirection: SortByDirection;
+    };
   };
   rowClickHref?: (arg: TRow) => string;
 }) => {
@@ -76,7 +81,9 @@ export const createList = async <
       ),
     );
   } else {
-    dataConfig = await Promise.resolve(loadData(context, { pagination: { currentPage, rowsPerPage } }));
+    dataConfig = await Promise.resolve(
+      loadData(context, { sort: config?.defaultSorting, pagination: { currentPage, rowsPerPage } }),
+    );
   }
 
   const totalPages = Math.ceil(dataConfig.totalRows / rowsPerPage);
