@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { FieldsDefinition, createForm } from "~/form/createForm";
 
-export const form = createForm({
+export const form = createForm<{ id: string }>({
   fields: {
     email: {
-      schema: ({ db, params }) =>
+      schema: ({ db }, { id }) =>
         z
           .string()
           .email()
@@ -15,7 +15,7 @@ export const form = createForm({
                 where: {
                   AND: {
                     email,
-                    NOT: { id: params["id"] },
+                    NOT: { id },
                   },
                 },
               })),

@@ -46,28 +46,35 @@ type PropsPerType =
       props: OmitName<RadioInputProps>;
     };
 
-export type FieldsDefinition = Record<
+export type FieldsDefinition<T> = Record<
   string,
   PropsPerType & {
-    schema: (context: ContextDecorated) => z.ZodTypeAny;
+    schema: (context: ContextDecorated, params?: T) => z.ZodTypeAny;
   }
 >;
 
-export const createForm = <TFields extends FieldsDefinition>({ fields }: { fields: TFields }) => {
+export const createForm = <
+  TParams extends Record<string, any>,
+  TFields extends FieldsDefinition<TParams> = FieldsDefinition<TParams>,
+>({
+  fields,
+}: {
+  fields: TFields;
+}) => {
   type Schema = z.ZodObject<{
     [Key in keyof TFields]: ReturnType<TFields[Key]["schema"]>;
   }>;
 
   type Data = z.infer<Schema>;
 
-  const getSchemaFromDefinition = (): Schema => {
+  const getSchemaFromDefinition = ({ params }: { params?: TParams }): Schema => {
     const ctx = globalContext.getStore();
     // @ts-ignore
     return z.object(
       Object.fromEntries(
         new Map(
           Object.keys(fields).map(
-            (k) => [k, fields[k].schema(ctx!)] as [keyof TFields, ReturnType<TFields[typeof k]["schema"]>],
+            (k) => [k, fields[k].schema(ctx!, params)] as [keyof TFields, ReturnType<TFields[typeof k]["schema"]>],
           ),
         ),
       ),
@@ -76,7 +83,11 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
 
   type Errors = Partial<Record<keyof Data, FieldError>>;
 
-  const handleForm = async (): Promise<{
+  const handleForm = async ({
+    params,
+  }: {
+    params?: TParams;
+  }): Promise<{
     data?: Data;
     errors?: Errors;
   }> => {
@@ -86,7 +97,7 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
       return { data: undefined, errors: undefined };
     }
 
-    const parsedSchema = await getSchemaFromDefinition().safeParseAsync(context?.body);
+    const parsedSchema = await getSchemaFromDefinition({ params }).safeParseAsync(context?.body);
 
     if (parsedSchema.success) {
       return { data: parsedSchema.data, errors: undefined };

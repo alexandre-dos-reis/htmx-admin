@@ -1,7 +1,8 @@
 import { globalContext } from "~/config/globalStorages";
 import { cn } from "~/utils";
+import { Home } from "./*";
 
-const NavLink = ({ href, children, class: classname, ...props }: JSX.HtmlAnchorTag) => {
+const NavLink = ({ href, children, class: classname, icon, ...props }: JSX.HtmlAnchorTag & { icon?: JSX.Element }) => {
   const path = globalContext?.getStore()?.path || "";
   const isCurrent = href === "/" ? path === href : path.startsWith(href || "");
 
@@ -15,6 +16,7 @@ const NavLink = ({ href, children, class: classname, ...props }: JSX.HtmlAnchorT
           : cn(
               "w-full text-center nav-link link no-underline px-7 py-2 mb-2 rounded italic",
               isCurrent ? "text-accent-content bg-accent" : "text-primary-content bg-primary",
+              icon && "flex justify-center items-center gap-3",
             )
       }
       preload="mouseover"
@@ -32,7 +34,14 @@ const NavLink = ({ href, children, class: classname, ...props }: JSX.HtmlAnchorT
           take .text-accent-content from .nav-link for me
         "
     >
-      {children}
+      {icon ? (
+        <>
+          <span>{icon}</span>
+          <span>{children}</span>
+        </>
+      ) : (
+        children
+      )}
     </a>
   );
 };
@@ -40,7 +49,12 @@ const NavLink = ({ href, children, class: classname, ...props }: JSX.HtmlAnchorT
 export const Navbar = () => (
   <nav id="navbar" hx-swap-oob="true" class={cn("sticky top-[70px] bg-base-200 h-[calc(100vh-70px)] py-5")}>
     <div class="px-10 flex flex-col items-start">
-      <NavLink href="/">Home</NavLink>
+      {/* <NavLink href="/" icon={<Home />}> */}
+      {/*   Home */}
+      {/* </NavLink> */}
+      <NavLink href="/" icon={<Home />}>
+        Home
+      </NavLink>
       <NavLink href="/customers">Customers</NavLink>
       <NavLink href="/shop">Shop</NavLink>
       <NavLink href="/events">Events</NavLink>

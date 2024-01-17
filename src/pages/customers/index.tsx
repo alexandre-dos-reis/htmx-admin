@@ -78,8 +78,7 @@ export const customers = new Elysia({ prefix: "/customers" })
   .group("/:id", (app) =>
     app
       .all("/", async ({ set, isFormSubmitted, db, params: { id } }) => {
-        const { data, errors } =
-          await handleForm(/* TODO: Try to pass here the second argument provided in the schema */);
+        const { data, errors } = await handleForm({ params: { id } });
 
         if (isFormSubmitted && data) {
           try {
