@@ -172,7 +172,7 @@ export const customers = new Elysia({ prefix: "/customers" })
           </Layout>
         );
       })
-      .all("/pictures", async () => {
+      .all("/pictures", async ({ db }) => {
         return (
           <Layout>
             <CustomersTabs>pictures</CustomersTabs>

@@ -26,7 +26,9 @@ type OmitName<TProps extends { name: string }> = Omit<TProps, "name">;
 
 type Params = { currentRecordId: string };
 
-type LoadSchema<T extends Params> = (context: NonNullable<ContextDecorated>, params?: T) => z.ZodTypeAny;
+type LoadSchema<T extends Params> =
+  | ((context: NonNullable<ContextDecorated>, params?: T) => z.ZodTypeAny)
+  | z.ZodTypeAny;
 
 type PropsPerType<T extends Params> =
   | {
@@ -59,25 +61,20 @@ export type FieldsDefinition = Record<string, PropsPerType<Params>>;
 
 export const createForm = <TFields extends FieldsDefinition>({ fields }: { fields: TFields }) => {
   type Schema = z.ZodObject<{
-    [Key in keyof TFields]: ReturnType<TFields[Key]["schema"]>;
+    [Key in keyof TFields]: Extract<TFields[Key]["schema"], z.ZodTypeAny>;
   }>;
 
   type Data = z.infer<Schema>;
 
   const getSchemaFromDefinition = (args?: { params?: Params }): Schema => {
     const ctx = globalContext.getStore();
-    // @ts-ignore
-    return z.object(
-      Object.fromEntries(
-        new Map(
-          Object.keys(fields).map((k) =>
-            args?.params
-              ? ([k, fields[k].schema(ctx!, args?.params)] as [keyof TFields, ReturnType<TFields[typeof k]["schema"]>])
-              : ([k, fields[k].schema(ctx!)] as [keyof TFields, ReturnType<TFields[typeof k]["schema"]>]),
-          ),
-        ),
-      ),
-    );
+
+    return Object.keys(fields).reduce((_schema, fieldKey) => {
+      const field = fields[fieldKey];
+      return _schema.extend({
+        [fieldKey]: typeof field.schema === "function" ? field.schema(ctx!, args?.params) : field.schema,
+      });
+    }, z.object({})) as Schema;
   };
 
   type Errors = Partial<Record<keyof Data, FieldError>>;
@@ -130,7 +127,7 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
     disableHxValidation,
   }: {
     loadDefaultValues?: (ctx: ContextDecorated) => MaybePromise<{
-      [Key in keyof TFields]: z.infer<ReturnType<TFields[Key]["schema"]>>;
+      [Key in keyof TFields]: z.infer<Extract<TFields[Key]["schema"], z.ZodTypeAny>>;
     }>;
     formProps?: ComponentProps<typeof Form>;
     errors?: Errors;
