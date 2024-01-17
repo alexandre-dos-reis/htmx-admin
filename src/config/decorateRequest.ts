@@ -1,7 +1,6 @@
 import { Context, Elysia } from "elysia";
 import { HX_HEADERS_CONSTANTS } from "./constants";
-import { getCustomers } from "~/pages/customers/customers";
-import { prisma } from "~/database/db";
+import { prisma } from "~/database/client";
 
 const decorate = ({ request }: Context) => {
   const isMethodPost = request.method === "POST";
@@ -20,7 +19,6 @@ const decorate = ({ request }: Context) => {
     hxTriggerId: request.headers.get("Hx-Trigger"),
     hxTriggerName: request.headers.get("Hx-Trigger-Name"),
     // APP
-    getCustomers,
     db: prisma,
     renderFragmentRoute: request.headers.has(HX_HEADERS_CONSTANTS.renderFragmentRoute),
     updateNavbar: request.headers.has(HX_HEADERS_CONSTANTS.updateNavbar),
