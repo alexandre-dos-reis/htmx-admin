@@ -1,28 +1,31 @@
 import { z } from "zod";
 import { FieldsDefinition, createForm } from "~/form/createForm";
 
-export const form = createForm<{ id: string }>({
+export const form = createForm({
   fields: {
     email: {
-      schema: ({ db }, { id }) =>
-        z
+      schema: ({ db }, params) => {
+        return z
           .string()
           .email()
           .max(255)
           .refine(
             async (email) =>
               !(await db.customer.count({
-                where: {
-                  AND: {
-                    email,
-                    NOT: { id },
-                  },
-                },
+                where: params
+                  ? {
+                      AND: {
+                        email,
+                        NOT: { id: params?.currentRecordId },
+                      },
+                    }
+                  : { email },
               })),
             {
               message: "Email is already taken",
             },
-          ),
+          );
+      },
       props: {
         autocomplete: "email",
         label: "Email",
@@ -57,8 +60,8 @@ export const form = createForm<{ id: string }>({
       props: {
         label: "Company",
         options: [
-          { label: "Google", value: "google.fr" },
-          { label: "Facebook", value: "2" },
+          { label: "Google", value: "google" },
+          { label: "Facebook", value: "fb" },
           { label: "Amazon", value: "amazon" },
         ],
       },

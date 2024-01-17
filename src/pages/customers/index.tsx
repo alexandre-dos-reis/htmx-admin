@@ -2,7 +2,7 @@ import { Elysia } from "elysia";
 import { form } from "./form";
 import { decorateRequest } from "~/config/decorateRequest";
 import { notify, notifyAndRedirect } from "~/response";
-import { Layout, Tabs } from "~/components/*";
+import { Layout, Link, Tabs } from "~/components/*";
 import { globalContext } from "~/config/globalStorages";
 import { createList } from "~/list/createList";
 
@@ -73,18 +73,63 @@ export const customers = new Elysia({ prefix: "/customers" })
       },
     });
 
-    return <Layout>{renderList()}</Layout>;
+    return (
+      <Layout>
+        <div class="flex justify-end mb-10">
+          <Link href="/customers/create" class="btn btn-primary">
+            Create a customer
+          </Link>
+        </div>
+        {renderList()}
+      </Layout>
+    );
+  })
+
+  .all("/create", async ({ set, isFormSubmitted, db }) => {
+    const { data, errors } = await handleForm();
+
+    if (isFormSubmitted && data) {
+      try {
+        const c = await db.customer.create({
+          data,
+          select: { id: true },
+        });
+        console.log(c);
+
+        return notifyAndRedirect({
+          set,
+          to: `/customers/${c.id}`,
+          message: "Creation saved successfully !",
+        });
+      } catch (error) {
+        console.log({ error });
+        notify({
+          set,
+          level: "error",
+          message: "A problem occured, please try again later !",
+        });
+      }
+      return;
+    }
+
+    return (
+      <Layout>
+        {await renderForm({
+          errors,
+        })}
+      </Layout>
+    );
   })
   .group("/:id", (app) =>
     app
-      .all("/", async ({ set, isFormSubmitted, db, params: { id } }) => {
-        const { data, errors } = await handleForm({ params: { id } });
+      .all("/", async ({ set, isFormSubmitted, db, params }) => {
+        const { data, errors } = await handleForm({ currentRecordId: params.id });
 
         if (isFormSubmitted && data) {
           try {
             await db.customer.update({
               data,
-              where: { id },
+              where: { id: params.id },
               select: { id: true },
             });
 
@@ -110,7 +155,7 @@ export const customers = new Elysia({ prefix: "/customers" })
                 loadDefaultValues: async ({ db }) => {
                   const c = await db.customer.findFirst({
                     where: {
-                      id,
+                      id: params.id,
                     },
                   })!;
 

@@ -24,57 +24,56 @@ export type AnonFormErrors = Record<string, FieldError> | undefined;
 
 type OmitName<TProps extends { name: string }> = Omit<TProps, "name">;
 
-type PropsPerType =
+type Params = { currentRecordId: string };
+
+type LoadSchema<T extends Params> = (context: NonNullable<ContextDecorated>, params?: T) => z.ZodTypeAny;
+
+type PropsPerType<T extends Params> =
   | {
       type?: "text";
       props: OmitName<TextInputProps>;
+      schema: LoadSchema<T>;
     }
   | {
       type: "toggle";
       props: OmitName<ToggleInputProps>;
+      schema: LoadSchema<T>;
     }
   | {
       type: "select";
       props: OmitName<SelectInputProps>;
+      schema: LoadSchema<T>;
     }
   | {
       type: "dropdown";
       props: OmitName<DropdownInputProps>;
+      schema: LoadSchema<T>;
     }
   | {
       type: "radio";
       props: OmitName<RadioInputProps>;
+      schema: LoadSchema<T>;
     };
 
-export type FieldsDefinition<T> = Record<
-  string,
-  PropsPerType & {
-    schema: (context: ContextDecorated, params?: T) => z.ZodTypeAny;
-  }
->;
+export type FieldsDefinition = Record<string, PropsPerType<Params>>;
 
-export const createForm = <
-  TParams extends Record<string, any>,
-  TFields extends FieldsDefinition<TParams> = FieldsDefinition<TParams>,
->({
-  fields,
-}: {
-  fields: TFields;
-}) => {
+export const createForm = <TFields extends FieldsDefinition>({ fields }: { fields: TFields }) => {
   type Schema = z.ZodObject<{
     [Key in keyof TFields]: ReturnType<TFields[Key]["schema"]>;
   }>;
 
   type Data = z.infer<Schema>;
 
-  const getSchemaFromDefinition = ({ params }: { params?: TParams }): Schema => {
+  const getSchemaFromDefinition = (args?: { params?: Params }): Schema => {
     const ctx = globalContext.getStore();
     // @ts-ignore
     return z.object(
       Object.fromEntries(
         new Map(
-          Object.keys(fields).map(
-            (k) => [k, fields[k].schema(ctx!, params)] as [keyof TFields, ReturnType<TFields[typeof k]["schema"]>],
+          Object.keys(fields).map((k) =>
+            args?.params
+              ? ([k, fields[k].schema(ctx!, args?.params)] as [keyof TFields, ReturnType<TFields[typeof k]["schema"]>])
+              : ([k, fields[k].schema(ctx!)] as [keyof TFields, ReturnType<TFields[typeof k]["schema"]>]),
           ),
         ),
       ),
@@ -83,11 +82,9 @@ export const createForm = <
 
   type Errors = Partial<Record<keyof Data, FieldError>>;
 
-  const handleForm = async ({
-    params,
-  }: {
-    params?: TParams;
-  }): Promise<{
+  const handleForm = async (
+    params?: Params,
+  ): Promise<{
     data?: Data;
     errors?: Errors;
   }> => {
@@ -110,7 +107,13 @@ export const createForm = <
     }
   };
 
-  const getComponent = ({ propsPerType, name }: { propsPerType: PropsPerType; name: string }) => {
+  const getComponent = ({
+    propsPerType: { schema, ...propsPerType },
+    name,
+  }: {
+    propsPerType: PropsPerType<Params>;
+    name: string;
+  }) => {
     return match(propsPerType)
       .with({ type: "text" }, ({ props }) => <TextInput {...props} name={name} />)
       .with({ type: "toggle" }, ({ props }) => <ToggleInput {...props} name={name} />)
@@ -144,10 +147,11 @@ export const createForm = <
     return (
       <Form {...formProps}>
         {Object.keys(fields).map(async (name) => {
-          const { type, props } = fields[name];
+          const { type, props, schema } = fields[name];
           return getComponent({
             name,
             propsPerType: {
+              schema,
               type: type as any,
               props: {
                 ...props,
@@ -162,10 +166,11 @@ export const createForm = <
   };
 
   const renderFormInput = ({ name, error }: { name: keyof TFields; error: FieldError }) => {
-    const { type, props } = fields[name];
+    const { type, props, schema } = fields[name];
     return getComponent({
       name: name as string,
       propsPerType: {
+        schema,
         props: { ...props, errors: error } as any,
         type: type as any,
       },
