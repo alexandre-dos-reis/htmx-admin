@@ -75,7 +75,7 @@ export const customers = new Elysia({ prefix: "/customers" })
 
     return (
       <Layout>
-        <div class="flex justify-end mb-10">
+        <div class="flex justify-end mb-6">
           <Link href="/customers/create" class="btn btn-primary">
             Create a customer
           </Link>
@@ -94,7 +94,6 @@ export const customers = new Elysia({ prefix: "/customers" })
           data,
           select: { id: true },
         });
-        console.log(c);
 
         return notifyAndRedirect({
           set,
@@ -102,7 +101,6 @@ export const customers = new Elysia({ prefix: "/customers" })
           message: "Creation saved successfully !",
         });
       } catch (error) {
-        console.log({ error });
         notify({
           set,
           level: "error",
