@@ -15,7 +15,7 @@ const NavLink = ({ href, children, class: classname, icon, ...props }: JSX.HtmlA
           ? cn(classname)
           : cn(
               "w-full text-center nav-link link no-underline px-7 py-2 mb-2 rounded",
-              isCurrent ? "text-accent-content bg-accent" : "text-primary-content bg-primary",
+              isCurrent ? "text-accent-content bg-accent" : "text-neutral-content bg-neutral",
               icon ? "flex justify-center items-center gap-3" : "italic",
             )
       }
@@ -26,10 +26,10 @@ const NavLink = ({ href, children, class: classname, icon, ...props }: JSX.HtmlA
       hx-push-url="true"
       hx-replace-url="true"
       _="on click
-          add .bg-primary to .nav-link then
-          add .text-primary-content to .nav-link then
-          remove .bg-primary from me then
-          remove .text-primary-content from me then
+          add .bg-neutral to .nav-link then
+          add .text-neutral-content to .nav-link then
+          remove .bg-neutral from me then
+          remove .text-neutral-content from me then
           take .bg-accent from .nav-link for me then
           take .text-accent-content from .nav-link for me
         "
