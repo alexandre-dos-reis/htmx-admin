@@ -3,6 +3,7 @@ import { ContextDecorated } from "~/config/decorateRequest";
 import { globalContext } from "~/config/globalStorages";
 import { cn, isObjectEmpty } from "~/utils";
 import { z } from "zod";
+import { MaybePromise } from "~/utils/types";
 
 type ColumnDef<T> = {
   label?: string;
@@ -11,8 +12,6 @@ type ColumnDef<T> = {
 };
 
 const orderByDirectionSchema = z.union([z.literal("asc"), z.literal("desc")]);
-
-type MaybePromise<T> = T | Promise<T>;
 
 type LoadDataConfig<T extends Array<Record<string, any>>> = { data: T; totalRows: number };
 
@@ -67,7 +66,10 @@ export const createList = async <
         context,
         parsed.success
           ? {
-              sort: { byDirection: parsed.data.byDirection || "desc", byName: parsed.data.byName as TColumnsKeys },
+              sort:
+                parsed.data.byDirection && parsed.data.byName
+                  ? { byDirection: parsed.data.byDirection, byName: parsed.data.byName as TColumnsKeys }
+                  : undefined,
               pagination: { currentPage, rowsPerPage },
             }
           : { sort: undefined, pagination: { currentPage, rowsPerPage } },

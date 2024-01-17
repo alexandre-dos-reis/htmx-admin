@@ -5,10 +5,10 @@ import { HX_HEADERS_CONSTANTS } from "~/config/constants";
 interface Props extends JSX.HtmlFormTag {
   submitBtnlabel?: string;
   hxHeaders?: Record<string, string>;
-  renderAsFragmentRoute?: boolean;
+  // renderAsFragmentRoute?: boolean;
 }
 
-export const Form = ({ children, submitBtnlabel, hxHeaders, renderAsFragmentRoute, ...otherProps }: Props) => {
+export const Form = ({ children, submitBtnlabel, hxHeaders, ...otherProps }: Props) => {
   const context = globalContext.getStore();
   return (
     <form
@@ -17,14 +17,8 @@ export const Form = ({ children, submitBtnlabel, hxHeaders, renderAsFragmentRout
       autocomplete="off"
       hx-post={context?.path}
       hx-swap="outerHTML"
-      hx-headers={
-        hxHeaders || renderAsFragmentRoute
-          ? JSON.stringify({
-              ...hxHeaders,
-              ...(renderAsFragmentRoute ? { [HX_HEADERS_CONSTANTS.renderFragmentRoute]: "true" } : {}),
-            })
-          : undefined
-      }
+      hx-replace-url="true"
+      hx-headers={hxHeaders ? JSON.stringify(hxHeaders) : undefined}
       {...otherProps}
     >
       <div class={cn("grid grid-cols-12 lg:gap-x-20 gap-y-3 mb-20")}>{children}</div>

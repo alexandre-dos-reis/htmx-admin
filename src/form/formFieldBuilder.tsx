@@ -19,13 +19,6 @@ export const formFieldBuilder = <TInputProps extends InputProps>(props: TInputPr
   const errors = props.errors;
   const errorId = `${props.name}${ATTRIBUTES_CONSTANTS.form["inputErrorId"]}`;
 
-  // if (props.name === "toggle")
-  //   console.log({
-  //     value: (typeof context?.body !== "undefined"
-  //       ? (context?.body as Record<string, string>)?.[props.name]
-  //       : props.value) as TInputProps["value"],
-  //   });
-
   return {
     inputProps: {
       ...props,
@@ -67,7 +60,7 @@ export const formFieldBuilder = <TInputProps extends InputProps>(props: TInputPr
     error: {
       errorId,
       isError: !!errors,
-      Errors: errors ? <Error id={errorId}>{errors.join(" ")}</Error> : null,
+      Errors: errors ? <Error id={errorId}>{errors[0]}</Error> : null,
     },
   };
 };

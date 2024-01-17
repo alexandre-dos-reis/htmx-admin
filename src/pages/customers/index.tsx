@@ -1,7 +1,7 @@
 import { Elysia } from "elysia";
 import { form } from "./form";
 import { decorateRequest } from "~/config/decorateRequest";
-import { notifyAndRedirect } from "~/response";
+import { notify, notifyAndRedirect } from "~/response";
 import { Layout, Tabs } from "~/components/*";
 import { globalContext } from "~/config/globalStorages";
 import { createList } from "~/list/createList";
@@ -15,7 +15,6 @@ const CustomersTabs = (p: JSX.ElementChildrenAttribute) => {
   const tabs = [
     { href: basePath, label: "General" },
     { href: `${basePath}/pictures`, label: "Pictures" },
-    { href: `${basePath}/infos`, label: "Infos" },
   ];
 
   return <Tabs tabs={tabs}>{p.children}</Tabs>;
@@ -47,10 +46,7 @@ export const customers = new Elysia({ prefix: "/customers" })
             <div class="flex items-center gap-3">
               <div class="avatar">
                 <div class="mask mask-squircle w-12 h-12">
-                  <img
-                    src={`https://daisyui.com/tailwind-css-component-profile-${d.img}@56w.png`}
-                    alt="Avatar Tailwind CSS Component"
-                  />
+                  <img src={`https://i.pravatar.cc/100?u=${d.id}`} alt="Avatar Tailwind CSS Component" />
                 </div>
               </div>
               <div>
@@ -81,35 +77,53 @@ export const customers = new Elysia({ prefix: "/customers" })
   })
   .group("/:id", (app) =>
     app
-      .all("/", async ({ set, isFormSubmitted }) => {
-        const { data, errors } = await handleForm();
+      .all("/", async ({ set, isFormSubmitted, db, params: { id } }) => {
+        const { data, errors } =
+          await handleForm(/* TODO: Try to pass here the second argument provided in the schema */);
 
         if (isFormSubmitted && data) {
-          // Do something with the data...
-          return notifyAndRedirect({
-            set,
-            to: "/customers",
-            message: "Changes saved successfully !",
-          });
+          try {
+            await db.customer.update({
+              data,
+              where: { id },
+              select: { id: true },
+            });
+
+            return notifyAndRedirect({
+              set,
+              to: "/customers",
+              message: "Changes saved successfully !",
+            });
+          } catch (error) {
+            notify({
+              set,
+              level: "error",
+              message: "A problem occured, please try again later !",
+            });
+          }
         }
 
         return (
           <Layout>
             <CustomersTabs>
-              {renderForm({
-                formProps: {
-                  renderAsFragmentRoute: true,
-                },
+              {await renderForm({
                 errors,
-                defaultValues: () => ({
-                  age: 23,
-                  email: "alex@gmail.com",
-                  name: "Alex",
-                  toggle: true,
-                  radio: "choice-3",
-                  select: "",
-                  dropdown: ["choice-1"],
-                }),
+                loadDefaultValues: async ({ db }) => {
+                  const c = await db.customer.findFirst({
+                    where: {
+                      id,
+                    },
+                  })!;
+
+                  return {
+                    color: c?.color || "",
+                    job: c?.job || "",
+                    company: c?.company || "",
+                    location: c?.location || "",
+                    name: c?.name || "",
+                    email: c?.email || "",
+                  };
+                },
               })}
             </CustomersTabs>
           </Layout>
@@ -119,13 +133,6 @@ export const customers = new Elysia({ prefix: "/customers" })
         return (
           <Layout>
             <CustomersTabs>pictures</CustomersTabs>
-          </Layout>
-        );
-      })
-      .all("/infos", async () => {
-        return (
-          <Layout>
-            <CustomersTabs>Infos</CustomersTabs>
           </Layout>
         );
       }),

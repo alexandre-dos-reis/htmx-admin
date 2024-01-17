@@ -67,7 +67,7 @@ export const List = ({ rows, headers, totalPages, currentPage, ...p }: ListProps
           <tbody>{rows}</tbody>
         </table>
       </div>
-      <Pagination currentPage={currentPage} pages={pages} />
+      {totalPages > 1 ? <Pagination currentPage={currentPage} pages={pages} /> : null}
     </>
   );
 };

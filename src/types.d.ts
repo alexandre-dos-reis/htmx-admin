@@ -18,5 +18,6 @@ declare namespace JSX {
     "hx-target"?: (string & {}) | "#main";
     "hx-headers"?: string;
     "hx-replace-url"?: "true";
+    "hx-push-url"?: "true";
   }
 }

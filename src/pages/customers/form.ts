@@ -3,37 +3,26 @@ import { FieldsDefinition, createForm } from "~/form/createForm";
 
 export const form = createForm({
   fields: {
-    dropdown: {
-      type: "dropdown",
-      schema: z.preprocess(
-        (v) => {
-          if (typeof v === "string") {
-            v = [v];
-          }
-          return (v as Array<string>).filter(Boolean);
-        },
-        z.array(z.string()).min(1, "This selection can't be empty !"),
-      ),
-      props: {
-        label: "Choices",
-        choices: [
-          { children: "Choice 1", value: "choice-1" },
-          { children: "Choice 2", value: "choice-2" },
-          { children: "Choice 3", value: "choice-3" },
-          { children: "Choice 4", value: "choice-4" },
-          { children: "Choice 5", value: "choice-5" },
-          { children: "Choice 6", value: "choice-6" },
-        ],
-      },
-    },
     email: {
-      schema: z
-        .string()
-        .email()
-        .max(255)
-        .refine(async (email) => email !== "john@doe.com", {
-          message: "Email is already taken",
-        }),
+      schema: ({ db, params }) =>
+        z
+          .string()
+          .email()
+          .max(255)
+          .refine(
+            async (email) =>
+              !(await db.customer.count({
+                where: {
+                  AND: {
+                    email,
+                    NOT: { id: params["id"] },
+                  },
+                },
+              })),
+            {
+              message: "Email is already taken",
+            },
+          ),
       props: {
         autocomplete: "email",
         label: "Email",
@@ -43,7 +32,7 @@ export const form = createForm({
       },
     },
     name: {
-      schema: z.string().min(3).max(255),
+      schema: () => z.string().min(3).max(255),
       props: {
         autocomplete: "name",
         label: "Name",
@@ -52,49 +41,50 @@ export const form = createForm({
         },
       },
     },
-    age: {
-      schema: z
-        .string()
-        .min(1)
-        .max(3)
-        .transform((v) => parseInt(v, 10)),
+    location: {
+      schema: () => z.string().min(3).max(255),
       props: {
-        type: "number",
-        label: "Age",
+        autocomplete: "name",
+        label: "Location",
         hxValidation: {
           triggerOn: "blur",
         },
       },
     },
-    select: {
+    company: {
       type: "select",
-      schema: z.string().min(1, "Please, select a choice !"),
+      schema: () => z.string().min(1, "Please, select a company !"),
       props: {
-        label: "Select",
+        label: "Company",
         options: [
-          { label: "Choice 1", value: "choice-1" },
-          { label: "Choice 2", value: "choice-2" },
-          { label: "Choice 3", value: "choice-3" },
+          { label: "Google", value: "google.fr" },
+          { label: "Facebook", value: "2" },
+          { label: "Amazon", value: "amazon" },
         ],
       },
     },
-    toggle: {
-      type: "toggle",
-      schema: z.coerce.boolean(),
+    job: {
+      type: "select",
+      schema: () => z.string().min(1, "Please, select a company !"),
       props: {
-        label: "Do you agree ?",
+        label: "Job",
+        options: [
+          { label: "Dev", value: "dev" },
+          { label: "LeadDev", value: "lead-dev" },
+          { label: "Devops", value: "devops" },
+        ],
       },
     },
-    radio: {
-      type: "radio",
-      schema: z.string(),
+    color: {
+      type: "select",
+      schema: () => z.string().min(1, "Please, select a color !"),
       props: {
-        choices: [
-          { children: "Choice 1", value: "choice-1" },
-          { children: "Choice 2", value: "choice-2" },
-          { children: "Choice 3", value: "choice-3" },
+        label: "Color",
+        options: [
+          { label: "Red", value: "red" },
+          { label: "Blue", value: "blue" },
+          { label: "Black", value: "black" },
         ],
-        label: "Choices",
       },
     },
   } satisfies FieldsDefinition,

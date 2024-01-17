@@ -3,7 +3,8 @@ import { cn } from "~/utils";
 
 const NavLink = ({ href, children, class: classname, ...props }: JSX.HtmlAnchorTag) => {
   const path = globalContext?.getStore()?.path || "";
-  const isCurrent = path.startsWith(href || "");
+  const isCurrent = href === "/" ? path === href : path.startsWith(href || "");
+
   return (
     <a
       hx-get={href}
@@ -12,7 +13,7 @@ const NavLink = ({ href, children, class: classname, ...props }: JSX.HtmlAnchorT
         classname
           ? cn(classname)
           : cn(
-              "nav-link link no-underline  px-5 py-2 mb-2 rounded italic",
+              "w-full text-center nav-link link no-underline px-7 py-2 mb-2 rounded italic",
               isCurrent ? "text-accent-content bg-accent" : "text-primary-content bg-primary",
             )
       }
@@ -20,6 +21,7 @@ const NavLink = ({ href, children, class: classname, ...props }: JSX.HtmlAnchorT
       // hx-swap="outerHTML" this is causing a conflict with elements that have oob enabled
       hx-select="#main"
       hx-target="#main"
+      hx-push-url="true"
       hx-replace-url="true"
       _="on click
           add .bg-primary to .nav-link then
@@ -38,6 +40,7 @@ const NavLink = ({ href, children, class: classname, ...props }: JSX.HtmlAnchorT
 export const Navbar = () => (
   <nav id="navbar" hx-swap-oob="true" class={cn("sticky top-[70px] bg-base-200 h-[calc(100vh-70px)] py-5")}>
     <div class="px-10 flex flex-col items-start">
+      <NavLink href="/">Home</NavLink>
       <NavLink href="/customers">Customers</NavLink>
       <NavLink href="/shop">Shop</NavLink>
       <NavLink href="/events">Events</NavLink>

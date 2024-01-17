@@ -17,6 +17,7 @@ import { ATTRIBUTES_CONSTANTS } from "~/config/constants";
 import { match } from "ts-pattern";
 import { globalContext } from "~/config/globalStorages";
 import { ContextDecorated } from "~/config/decorateRequest";
+import { MaybePromise } from "~/utils/types";
 
 export type FieldError = Array<string> | undefined;
 export type AnonFormErrors = Record<string, FieldError> | undefined;
@@ -48,22 +49,27 @@ type PropsPerType =
 export type FieldsDefinition = Record<
   string,
   PropsPerType & {
-    schema: z.ZodTypeAny;
+    schema: (context: ContextDecorated) => z.ZodTypeAny;
   }
 >;
 
 export const createForm = <TFields extends FieldsDefinition>({ fields }: { fields: TFields }) => {
   type Schema = z.ZodObject<{
-    [Key in keyof TFields]: TFields[Key]["schema"];
+    [Key in keyof TFields]: ReturnType<TFields[Key]["schema"]>;
   }>;
 
   type Data = z.infer<Schema>;
 
   const getSchemaFromDefinition = (): Schema => {
+    const ctx = globalContext.getStore();
     // @ts-ignore
     return z.object(
       Object.fromEntries(
-        new Map(Object.keys(fields).map((k) => [k, fields[k].schema] as [keyof TFields, TFields[typeof k]["schema"]])),
+        new Map(
+          Object.keys(fields).map(
+            (k) => [k, fields[k].schema(ctx!)] as [keyof TFields, ReturnType<TFields[typeof k]["schema"]>],
+          ),
+        ),
       ),
     );
   };
@@ -103,15 +109,15 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
       .otherwise(({ props }) => <TextInput {...props} name={name} />);
   };
 
-  const renderForm = ({
+  const renderForm = async ({
     formProps,
-    defaultValues,
+    loadDefaultValues,
     errors,
     disableHxValidation,
   }: {
-    defaultValues?: (ctx: ContextDecorated) => {
-      [Key in keyof TFields]: z.infer<TFields[Key]["schema"]>;
-    };
+    loadDefaultValues?: (ctx: ContextDecorated) => MaybePromise<{
+      [Key in keyof TFields]: z.infer<ReturnType<TFields[Key]["schema"]>>;
+    }>;
     formProps?: ComponentProps<typeof Form>;
     errors?: Errors;
     disableHxValidation?: boolean;
@@ -122,9 +128,11 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
       return renderInputFromHxRequest({ errors });
     }
 
+    const defaultValues = context?.isMethodGet ? await loadDefaultValues?.(context) : undefined;
+
     return (
       <Form {...formProps}>
-        {Object.keys(fields).map((name) => {
+        {Object.keys(fields).map(async (name) => {
           const { type, props } = fields[name];
           return getComponent({
             name,
@@ -132,7 +140,7 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
               type: type as any,
               props: {
                 ...props,
-                value: context?.isMethodGet ? defaultValues?.(context)[name] : undefined,
+                value: context?.isMethodGet ? defaultValues?.[name] : undefined,
                 errors: errors?.[name],
               },
             },
