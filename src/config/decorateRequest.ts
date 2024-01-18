@@ -26,8 +26,8 @@ const decorate = ({ request }: Context) => {
     hxTriggerId,
     // APP
     db: prisma,
-    renderFragmentRoute: request.headers.has(HX_HEADERS_CONSTANTS.renderFragmentRoute),
-    updateNavbar: request.headers.has(HX_HEADERS_CONSTANTS.updateNavbar),
+    renderFragment: request.headers.has(HX_HEADERS_CONSTANTS.renderFragment),
+    renderNavbar: request.headers.has(HX_HEADERS_CONSTANTS.renderNavbar),
     isFormValidationRequest,
     inputNameRequest,
     isFormSubmitted:

@@ -50,7 +50,7 @@ export const Navbar = () => (
   <nav
     id="navbar"
     hx-swap-oob="true"
-    class={cn("sticky top-[70px] bg-base-300 bg-opacity-50 backdrop-blur h-[calc(100vh-70px)] py-5")}
+    class={cn("sticky top-[70px] bg-base-300 bg-opacity-90 backdrop-blur h-[calc(100vh-70px)] py-5")}
   >
     <div class="px-10 flex flex-col">
       <NavLink href="/" icon={"🏠"}>

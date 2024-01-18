@@ -6,13 +6,9 @@ import { HX_HEADERS_CONSTANTS } from "~/config/constants";
 export const Tabs = (p: JSX.ElementChildrenAttribute & { tabs: Array<{ href: string; label: string }> }) => {
   const context = globalContext.getStore();
 
-  if (context?.isFormValidationRequest) {
-    return <>{p.children}</>;
-  }
-
   return (
     <>
-      {!context?.renderFragmentRoute ? (
+      {!context?.renderFragment && (
         <div role="tablist" class="tabs tabs-boxed mb-16">
           {p.tabs.map((t) => {
             const isActive = context?.path === t.href;
@@ -21,11 +17,10 @@ export const Tabs = (p: JSX.ElementChildrenAttribute & { tabs: Array<{ href: str
                 href={t.href}
                 role="tab"
                 class={cn("tab", isActive && "tab-active cursor-default")}
-                hxHeaders={{ [HX_HEADERS_CONSTANTS.renderFragmentRoute]: "true" }}
+                hxHeaders={{ [HX_HEADERS_CONSTANTS.renderFragment]: "true" }}
                 hx-swap="outerHTML"
                 hx-target="#tab-fragment"
                 hx-select="#tab-fragment"
-                // preload="mouseover"
                 _="on click take .tab-active from .tab for me then toggle .cursor-default on .tab"
               >
                 {t.label}
@@ -33,7 +28,7 @@ export const Tabs = (p: JSX.ElementChildrenAttribute & { tabs: Array<{ href: str
             );
           })}
         </div>
-      ) : null}
+      )}
       <div id="tab-fragment">{p.children}</div>
     </>
   );

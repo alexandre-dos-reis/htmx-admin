@@ -1,8 +1,8 @@
 export const HX_HEADERS_CONSTANTS = {
   formValidation: "App-Form-Validation",
-  formUpdate: "App-Form-Update",
-  updateNavbar: "App-Update-navbar",
-  renderFragmentRoute: "App-Fragment-route",
+  renderFormUpdate: "App-Render-Form-Update",
+  renderNavbar: "App-Render-Navbar",
+  renderFragment: "App-Fragment",
 } as const;
 
 export const ATTRIBUTES_CONSTANTS = {

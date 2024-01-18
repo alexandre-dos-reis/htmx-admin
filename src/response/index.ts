@@ -18,7 +18,7 @@ export const redirectTo = (args: { to: string; set: Set }) => {
   args.set.headers["HX-Location"] = JSON.stringify({
     path: args.to,
     headers: {
-      [HX_HEADERS_CONSTANTS.updateNavbar]: true,
+      [HX_HEADERS_CONSTANTS.renderNavbar]: true,
     },
     target: "#main",
     select: "#main",

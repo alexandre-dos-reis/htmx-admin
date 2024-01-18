@@ -63,13 +63,16 @@ export const customers = new Elysia({ prefix: "/customers" })
       },
     });
 
+    const ctx = globalContext.getStore();
     return (
       <Layout>
-        <div class="flex justify-end mb-6">
-          <Link href="/customers/create" class="btn btn-primary">
-            Create a customer
-          </Link>
-        </div>
+        {ctx?.renderFragment ? null : (
+          <div class="flex justify-end mb-6">
+            <Link href="/customers/create" class="btn btn-primary">
+              Create a customer
+            </Link>
+          </div>
+        )}
         {renderList()}
       </Layout>
     );
@@ -143,7 +146,7 @@ export const customers = new Elysia({ prefix: "/customers" })
                   <img src={`https://i.pravatar.cc/100?u=${params.id}`} alt="Avatar Tailwind CSS Component" />
                 </div>
               </div>
-              {await renderForm({
+              {renderForm({
                 errors,
                 loadDefaultValues: async ({ db }) => {
                   return await db.customer.findFirst({
@@ -160,7 +163,7 @@ export const customers = new Elysia({ prefix: "/customers" })
       .all("/pictures", async () => {
         return (
           <Layout>
-            <CustomersTabs>pictures</CustomersTabs>
+            <CustomersTabs>Pictures</CustomersTabs>
           </Layout>
         );
       }),

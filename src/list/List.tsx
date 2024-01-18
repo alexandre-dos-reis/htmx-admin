@@ -2,6 +2,7 @@ import { globalContext } from "~/config/globalStorages";
 import qs from "qs";
 import { Sort, SortUp, SortDown, XMark } from "~/components/svg/*";
 import { cn } from "~/utils";
+import { HX_HEADERS_CONSTANTS } from "~/config/constants";
 
 export type TableQuery = { orderByName?: string; orderByDir?: "desc" | "asc"; page?: number } | undefined;
 
@@ -13,11 +14,17 @@ export interface ListProps extends JSX.HtmlTableTag {
   enableFooter?: boolean;
 }
 
+const hxProps = {
+  "hx-headers": JSON.stringify({ [HX_HEADERS_CONSTANTS.renderFragment]: "true" }),
+  "hx-replace-url": "true",
+  "hx-target": "#list",
+};
+
 export const List = ({ rows, headers, totalPages, currentPage, enableFooter, ...p }: ListProps) => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <div>
+    <div id="list">
       <table class={cn("relative table border-separate border-spacing-0")} {...p}>
         <thead class="overflow-hidden">
           <ColumnsTitle headers={headers} />
@@ -57,7 +64,7 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
             ) : (
               <div
                 class="flex gap-3 w-full"
-                hx-replace-url="true"
+                {...hxProps}
                 hx-get={`${context?.path}?${qs.stringify({
                   ...query,
                   orderByName: h.queryName,
@@ -78,8 +85,8 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
             )}
             <XMark
               class={cn("z-[1] invisible fill-neutral-500", query?.orderByName === h.queryName && "visible")}
+              {...hxProps}
               hx-get={context?.path}
-              hx-replace-url="true"
             />
           </div>
         </th>
@@ -98,8 +105,8 @@ const Pagination = (p: { pages: number[]; currentPage: number }) => {
         {p.pages.map((px) => (
           <button
             class={cn("join-item btn", px === p.currentPage && "btn-primary")}
+            {...hxProps}
             hx-get={`${context?.path}?${qs.stringify({ ...query, page: px })}`}
-            hx-replace-url="true"
           >
             {px}
           </button>

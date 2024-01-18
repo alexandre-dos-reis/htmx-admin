@@ -12,7 +12,7 @@ export const Header = () => {
           class="btn btn-ghost text-xl"
           href="/"
           hx-target="#main"
-          hxHeaders={{ [HX_HEADERS_CONSTANTS.updateNavbar]: "true" }}
+          hxHeaders={{ [HX_HEADERS_CONSTANTS.renderNavbar]: "true" }}
         >
           <span class="italic text-primary">htmx</span> Admin
         </Link>
