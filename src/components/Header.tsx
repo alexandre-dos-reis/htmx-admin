@@ -6,7 +6,7 @@ import { HX_HEADERS_CONSTANTS } from "~/config/constants";
 
 export const Header = () => {
   return (
-    <header class={cn("sticky top-0 z-[2] flex items-center bg-base-300 bg-opacity-50 backdrop-blur h-[70px] px-10")}>
+    <header class={cn("sticky top-0 z-[2] flex items-center bg-base-300 bg-opacity-90 backdrop-blur h-[70px] px-10")}>
       <div class="flex-1">
         <Link
           class="btn btn-ghost text-xl"

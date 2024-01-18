@@ -5,7 +5,12 @@ import { Header } from "./Header";
 import { Navbar } from "./Navbar";
 
 const Main = (p: JSX.ElementChildrenAttribute) => (
-  <main id="main" hx-swap="outerHTML" hx-swap-oob="true" class={cn("mx-5 sm:mx-10 md:mx-15 lg:mx-20 pt-10 pb-20")}>
+  <main
+    id="main"
+    hx-swap="outerHTML"
+    hx-swap-oob="true"
+    class={cn("relative mx-5 sm:mx-10 md:mx-15 lg:mx-20 pt-10 pb-20")}
+  >
     {p.children}
   </main>
 );

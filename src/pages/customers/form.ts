@@ -90,5 +90,12 @@ export const form = createForm({
         ],
       },
     },
+    // isActive: {
+    //   type: "toggle",
+    //   schema: () => z.coerce.boolean(),
+    //   props: {
+    //     label: "Active ?",
+    //   },
+    // },
   } satisfies FieldsDefinition,
 });
