@@ -1,6 +1,5 @@
 import { globalContext } from "~/config/globalStorages";
 import { cn } from "../utils";
-import { HX_HEADERS_CONSTANTS } from "~/config/constants";
 
 interface Props extends JSX.HtmlFormTag {
   submitBtnlabel?: string;

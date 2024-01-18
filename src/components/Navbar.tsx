@@ -47,7 +47,11 @@ const NavLink = ({ href, children, class: classname, icon, ...props }: JSX.HtmlA
 };
 
 export const Navbar = () => (
-  <nav id="navbar" hx-swap-oob="true" class={cn("sticky top-[70px] bg-base-200 h-[calc(100vh-70px)] py-5")}>
+  <nav
+    id="navbar"
+    hx-swap-oob="true"
+    class={cn("sticky top-[70px] bg-base-200 bg-opacity-50 backdrop-blur h-[calc(100vh-70px)] py-5")}
+  >
     <div class="px-10 flex flex-col">
       <NavLink href="/" icon={"🏠"}>
         Home

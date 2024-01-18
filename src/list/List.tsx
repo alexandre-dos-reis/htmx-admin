@@ -26,7 +26,12 @@ export const List = ({ rows, headers, totalPages, currentPage, ...p }: ListProps
           <thead>
             <tr>
               {headers.map((h) => (
-                <th class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-200")}>
+                <th
+                  class={cn(
+                    !h.disabledSorting && "cursor-pointer hover:bg-base-200",
+                    query?.orderByName === h.queryName && "bg-base-200",
+                  )}
+                >
                   <div class="flex justify-between">
                     {h.disabledSorting ? (
                       <span>{h.label}</span>
