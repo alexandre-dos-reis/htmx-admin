@@ -1,12 +1,18 @@
 import { Context, Elysia } from "elysia";
-import { HX_HEADERS_CONSTANTS } from "./constants";
+import { ATTRIBUTES_CONSTANTS, HX_HEADERS_CONSTANTS } from "./constants";
 import { prisma } from "~/database/client";
 
 const decorate = ({ request }: Context) => {
   const isMethodPost = request.method === "POST";
   const isMethodGet = request.method === "GET";
   const contentType = request.headers.get("Content-Type");
-  const isFormValidationRequest = request.headers.has(HX_HEADERS_CONSTANTS["formValidation"]);
+  const isFormValidationRequest = isMethodPost && request.headers.has(HX_HEADERS_CONSTANTS["formValidation"]);
+
+  const hxTargetId = request.headers.get("Hx-Target");
+  const hxTriggerName = request.headers.get("Hx-Trigger-Name");
+  const hxTriggerId = request.headers.get("Hx-Trigger");
+
+  const inputNameRequest = hxTriggerName || hxTargetId?.replace(ATTRIBUTES_CONSTANTS.form["inputWrapperId"], "") || "";
 
   return {
     // HTTP
@@ -15,14 +21,15 @@ const decorate = ({ request }: Context) => {
     // HTMX
     isHxRequest: request.headers.has("Hx-Request"),
     isHxBoost: request.headers.has("Hx-Boost"),
-    hxTargetId: request.headers.get("Hx-Target"),
-    hxTriggerId: request.headers.get("Hx-Trigger"),
-    hxTriggerName: request.headers.get("Hx-Trigger-Name"),
+    hxTargetId,
+    hxTriggerName,
+    hxTriggerId,
     // APP
     db: prisma,
     renderFragmentRoute: request.headers.has(HX_HEADERS_CONSTANTS.renderFragmentRoute),
     updateNavbar: request.headers.has(HX_HEADERS_CONSTANTS.updateNavbar),
     isFormValidationRequest,
+    inputNameRequest,
     isFormSubmitted:
       !isFormValidationRequest &&
       isMethodPost &&

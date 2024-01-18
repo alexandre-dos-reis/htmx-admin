@@ -13,8 +13,7 @@ import {
   TextInputProps,
 } from "./inputs/*";
 import { Form } from "./Form";
-import { ATTRIBUTES_CONSTANTS } from "~/config/constants";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 import { globalContext } from "~/config/globalStorages";
 import { ContextDecorated } from "~/config/decorateRequest";
 import { MaybePromise } from "~/utils/types";
@@ -26,9 +25,7 @@ type OmitName<TProps extends { name: string }> = Omit<TProps, "name">;
 
 type Params = { currentRecordId: string };
 
-type LoadSchema<T extends Params> =
-  | ((context: NonNullable<ContextDecorated>, params?: T) => z.ZodTypeAny)
-  | z.ZodTypeAny;
+type LoadSchema<T extends Params> = (context: NonNullable<ContextDecorated>, params?: T) => z.ZodTypeAny;
 
 type PropsPerType<T extends Params> =
   | {
@@ -61,10 +58,12 @@ export type FieldsDefinition = Record<string, PropsPerType<Params>>;
 
 export const createForm = <TFields extends FieldsDefinition>({ fields }: { fields: TFields }) => {
   type Schema = z.ZodObject<{
-    [Key in keyof TFields]: Extract<TFields[Key]["schema"], z.ZodTypeAny>;
+    [Key in keyof TFields]: ReturnType<TFields[Key]["schema"]>;
   }>;
 
   type Data = z.infer<Schema>;
+
+  type Errors = Partial<Record<keyof Data, FieldError>>;
 
   const getSchemaFromDefinition = (args?: { params?: Params }): Schema => {
     const ctx = globalContext.getStore();
@@ -76,8 +75,6 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
       });
     }, z.object({})) as Schema;
   };
-
-  type Errors = Partial<Record<keyof Data, FieldError>>;
 
   const handleForm = async (
     params?: Params,
@@ -91,15 +88,31 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
       return { data: undefined, errors: undefined };
     }
 
-    const parsedSchema = await getSchemaFromDefinition({ params }).safeParseAsync(context?.body);
+    const schema = getSchemaFromDefinition({ params });
+
+    let parsedSchema: Awaited<ReturnType<(typeof schema)["spa"]>>;
+
+    if (context.isFormValidationRequest) {
+      const name = context.inputNameRequest;
+      const body = context.body as Record<string, unknown>;
+
+      if (name && name in body && name in fields) {
+        parsedSchema = await schema.shape[name].spa(body[name]);
+      } else {
+        return { data: undefined, errors: undefined };
+      }
+    } else {
+      parsedSchema = await schema.spa(context?.body);
+    }
 
     if (parsedSchema.success) {
       return { data: parsedSchema.data, errors: undefined };
     } else {
       return {
         data: undefined,
-        // @ts-ignore
-        errors: parsedSchema.error.flatten().fieldErrors,
+        errors: (context.isFormValidationRequest
+          ? { [context.inputNameRequest]: parsedSchema.error.flatten().formErrors }
+          : parsedSchema.error.flatten().fieldErrors) as Errors,
       };
     }
   };
@@ -126,9 +139,7 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
     errors,
     disableHxValidation,
   }: {
-    loadDefaultValues?: (ctx: ContextDecorated) => MaybePromise<{
-      [Key in keyof TFields]: z.infer<Extract<TFields[Key]["schema"], z.ZodTypeAny>>;
-    }>;
+    loadDefaultValues?: (ctx: ContextDecorated) => MaybePromise<Data>;
     formProps?: ComponentProps<typeof Form>;
     errors?: Errors;
     disableHxValidation?: boolean;
@@ -176,8 +187,7 @@ export const createForm = <TFields extends FieldsDefinition>({ fields }: { field
 
   const renderInputFromHxRequest = (opts?: { errors?: Errors }) => {
     const context = globalContext.getStore();
-
-    let name = context?.hxTriggerName || context?.hxTargetId?.replace(ATTRIBUTES_CONSTANTS.form["inputWrapperId"], "");
+    const name = context?.inputNameRequest;
 
     if (name && name in fields) {
       return renderFormInput({ name, error: opts?.errors?.[name] });
