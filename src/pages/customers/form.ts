@@ -59,7 +59,7 @@ export const form = createForm({
       schema: () => z.string().min(1, "Please, select a company !"),
       props: {
         label: "Company",
-        options: [
+        options: () => [
           { label: "Google", value: "google" },
           { label: "Facebook", value: "fb" },
           { label: "Amazon", value: "amazon" },
@@ -71,7 +71,7 @@ export const form = createForm({
       schema: () => z.string().min(1, "Please, select a company !"),
       props: {
         label: "Job",
-        options: [
+        options: () => [
           { label: "Dev", value: "dev" },
           { label: "LeadDev", value: "lead-dev" },
           { label: "Devops", value: "devops" },
@@ -83,7 +83,7 @@ export const form = createForm({
       schema: () => z.string().min(1, "Please, select a color !"),
       props: {
         label: "Color",
-        options: [
+        options: () => [
           { label: "Red", value: "red" },
           { label: "Blue", value: "blue" },
           { label: "Black", value: "black" },

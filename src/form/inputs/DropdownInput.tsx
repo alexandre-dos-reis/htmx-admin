@@ -2,9 +2,11 @@ import { Check } from "~/components/svg/Check";
 import { XMark } from "~/components/svg/XMark";
 import { cn } from "~/utils";
 import { formFieldBuilder, BaseFormComponent } from "~/form/*";
+import { ContextDecorated } from "~/config/decorateRequest";
+import { globalContext } from "~/config/globalStorages";
 
 export interface DropdownInputProps extends Omit<JSX.HtmlInputTag, "name" | "value">, BaseFormComponent {
-  choices: Array<{ value: string; children: string }>;
+  choices: (ctx: ContextDecorated) => Array<{ value: string; children: string }>;
   value?: Array<string>;
   label: string;
   noSelectionLabel?: string;
@@ -20,7 +22,8 @@ export const DropdownInput = (props: DropdownInputProps) => {
     error: { Errors, isError, errorId },
   } = formFieldBuilder(props);
 
-  const choices = _choices.map((c) => ({
+  const ctx = globalContext.getStore()!;
+  const choices = _choices(ctx).map((c) => ({
     ...c,
     isSelected: value?.includes(c.value) || false,
     checkedId: `${id}-${c.value}-checked-value`,
