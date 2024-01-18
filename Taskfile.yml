@@ -27,6 +27,10 @@ tasks:
     cmds:
       - APP_ENV="development" PORT={{.SERVER_PORT}} VITE_PORT={{.VITE_PORT}} bun run --watch src/index.tsx
 
+  bun:build:
+    cmds:
+      - bun build --outdir=out ./src/index.tsx --target=bun --minify
+
   vite:dev:
     cmds:
       - bunx --bun vite --port {{.VITE_PORT}}
