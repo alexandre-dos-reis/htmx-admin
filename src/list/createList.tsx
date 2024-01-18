@@ -1,4 +1,4 @@
-import { List } from "~/components/List";
+import { List } from "./List";
 import { ContextDecorated } from "~/config/decorateRequest";
 import { globalContext } from "~/config/globalStorages";
 import { cn, isObjectEmpty } from "~/utils";

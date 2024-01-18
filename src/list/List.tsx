@@ -1,6 +1,6 @@
 import { globalContext } from "~/config/globalStorages";
 import qs from "qs";
-import { Sort, SortUp, SortDown, XMark } from "./svg/*";
+import { Sort, SortUp, SortDown, XMark } from "~/components/svg/*";
 import { cn } from "~/utils";
 
 export type TableQuery = { orderByName?: string; orderByDir?: "desc" | "asc"; page?: number } | undefined;
@@ -21,7 +21,6 @@ export const List = ({ rows, headers, totalPages, currentPage, ...p }: ListProps
 
   return (
     <>
-      {/* <Pagination currentPage={currentPage} pages={pages} /> */}
       <div class="overflow-x-auto">
         <table class="table table-pin-rows" {...p}>
           <thead>
@@ -38,8 +37,7 @@ export const List = ({ rows, headers, totalPages, currentPage, ...p }: ListProps
                         hx-get={`${context?.path}?${qs.stringify({
                           ...query,
                           orderByName: h.queryName,
-                          orderByDir:
-                            query?.orderByName === h.queryName && query.orderByDir === "desc" ? "asc" : "desc",
+                          orderByDir: query?.orderByName === h.queryName && query.orderByDir === "asc" ? "desc" : "asc",
                         })}`}
                       >
                         <span>

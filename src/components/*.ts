@@ -6,5 +6,4 @@ export * from "./Header";
 export * from "./Navbar";
 export * from "./Dropdown";
 export * from "./ThemeController";
-export * from "./List";
 export * from "./svg/*";
