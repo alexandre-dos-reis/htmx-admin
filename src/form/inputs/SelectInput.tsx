@@ -1,9 +1,9 @@
 import { cn } from "~/utils";
-import { formFieldBuilder, BaseFormComponent } from "~/form/*";
+import { formFieldBuilder, BaseInputComponent } from "~/form/*";
 import { ContextDecorated } from "~/config/decorateRequest";
 import { globalContext } from "~/config/globalStorages";
 
-export interface SelectInputProps extends Omit<JSX.HtmlSelectTag, "name" | "multiple">, BaseFormComponent {
+export interface SelectInputProps extends Omit<JSX.HtmlSelectTag, "name" | "multiple">, BaseInputComponent {
   options: (ctx: ContextDecorated) => Array<{ value: string; label: string }>;
   value?: string;
   defaultOptionLabel?: string;

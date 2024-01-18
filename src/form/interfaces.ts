@@ -6,7 +6,7 @@ export interface HxValidation {
   };
 }
 
-export interface BaseFormComponent {
+export interface BaseInputComponent {
   name: string;
   label?: string;
   errors?: Array<string>;

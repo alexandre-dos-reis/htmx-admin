@@ -1,7 +1,7 @@
 import { cn } from "~/utils";
-import { formFieldBuilder, BaseFormComponent } from "~/form/*";
+import { formFieldBuilder, BaseInputComponent } from "~/form/*";
 
-export interface ToggleInputProps extends Omit<JSX.HtmlInputTag, "name" | "value">, BaseFormComponent {
+export interface ToggleInputProps extends Omit<JSX.HtmlInputTag, "name" | "value">, BaseInputComponent {
   value?: boolean;
   label?: string;
   noLabel?: string;

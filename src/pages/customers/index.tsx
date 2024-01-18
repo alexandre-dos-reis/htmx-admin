@@ -152,27 +152,18 @@ export const customers = new Elysia({ prefix: "/customers" })
               {await renderForm({
                 errors,
                 loadDefaultValues: async ({ db }) => {
-                  const c = await db.customer.findFirst({
+                  return await db.customer.findFirst({
                     where: {
                       id: params.id,
                     },
-                  })!;
-
-                  return {
-                    color: c?.color || "",
-                    job: c?.job || "",
-                    company: c?.company || "",
-                    location: c?.location || "",
-                    name: c?.name || "",
-                    email: c?.email || "",
-                  };
+                  });
                 },
               })}
             </CustomersTabs>
           </Layout>
         );
       })
-      .all("/pictures", async ({ db }) => {
+      .all("/pictures", async () => {
         return (
           <Layout>
             <CustomersTabs>pictures</CustomersTabs>

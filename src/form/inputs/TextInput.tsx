@@ -1,7 +1,7 @@
 import { cn } from "~/utils";
-import { formFieldBuilder, BaseFormComponent, HxValidation } from "~/form/*";
+import { formFieldBuilder, BaseInputComponent, HxValidation } from "~/form/*";
 
-export interface TextInputProps extends Omit<JSX.HtmlInputTag, "name" | "type">, BaseFormComponent, HxValidation {
+export interface TextInputProps extends Omit<JSX.HtmlInputTag, "name" | "type">, BaseInputComponent, HxValidation {
   type?: JSX.HtmlInputTag["type"] | "textarea";
 }
 

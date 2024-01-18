@@ -1,11 +1,11 @@
 import { Check } from "~/components/svg/Check";
 import { XMark } from "~/components/svg/XMark";
 import { cn } from "~/utils";
-import { formFieldBuilder, BaseFormComponent } from "~/form/*";
+import { formFieldBuilder, BaseInputComponent } from "~/form/*";
 import { ContextDecorated } from "~/config/decorateRequest";
 import { globalContext } from "~/config/globalStorages";
 
-export interface DropdownInputProps extends Omit<JSX.HtmlInputTag, "name" | "value">, BaseFormComponent {
+export interface DropdownInputProps extends Omit<JSX.HtmlInputTag, "name" | "value">, BaseInputComponent {
   choices: (ctx: ContextDecorated) => Array<{ value: string; children: string }>;
   value?: Array<string>;
   label: string;

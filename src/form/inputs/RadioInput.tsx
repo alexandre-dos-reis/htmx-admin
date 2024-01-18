@@ -1,9 +1,9 @@
 import { cn } from "~/utils";
-import { formFieldBuilder, BaseFormComponent } from "~/form/*";
+import { formFieldBuilder, BaseInputComponent } from "~/form/*";
 import { ContextDecorated } from "~/config/decorateRequest";
 import { globalContext } from "~/config/globalStorages";
 
-export interface RadioInputProps extends Omit<JSX.HtmlInputTag, "name">, BaseFormComponent {
+export interface RadioInputProps extends Omit<JSX.HtmlInputTag, "name">, BaseInputComponent {
   label?: string;
   choices: (ctx: ContextDecorated) => Array<{ value: string; children: JSX.Element }>;
 }

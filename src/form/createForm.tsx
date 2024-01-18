@@ -16,7 +16,7 @@ import { Form } from "./Form";
 import { match } from "ts-pattern";
 import { globalContext } from "~/config/globalStorages";
 import { ContextDecorated } from "~/config/decorateRequest";
-import { MaybePromise } from "~/utils/types";
+import { MaybePromise, PartialExtended } from "~/utils/types";
 
 export type FieldError = Array<string> | undefined;
 export type AnonFormErrors = Record<string, FieldError> | undefined;
@@ -130,7 +130,7 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
     errors,
     disableHxValidation,
   }: {
-    loadDefaultValues?: (ctx: ContextDecorated) => MaybePromise<Data>;
+    loadDefaultValues?: (ctx: ContextDecorated) => MaybePromise<PartialExtended<Data> | null>;
     formProps?: ComponentProps<typeof Form>;
     errors?: Errors;
     disableHxValidation?: boolean;
@@ -153,7 +153,9 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
               type: type as any,
               props: {
                 ...props,
-                value: context?.isMethodGet ? defaultValues?.[name] : undefined,
+                value: (context?.isMethodGet && defaultValues ? defaultValues?.[name] : undefined) as  // Remove null
+                  | NonNullable<(typeof defaultValues)[keyof typeof defaultValues]>
+                  | undefined,
                 errors: errors?.[name],
               },
             },
