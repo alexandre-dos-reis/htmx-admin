@@ -26,7 +26,7 @@ export const customers = new Elysia({ prefix: "/customers" })
   .all("/", async () => {
     const { renderList } = await createList({
       config: { defaultSorting: { byDirection: "asc", byName: "name" } },
-      loadData: (ctx, state) => listStateMapperToDb({ ctx, state, modelName: "customer" }),
+      loadData: (ctx, state) => listStateMapperToDb({ ctx, state, modelName: "customer", select: {} }),
       rowClickHref: (data) => `/customers/${data.id}`,
       columns: {
         name: {
