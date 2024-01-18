@@ -37,7 +37,7 @@ export const List = ({ rows, headers, totalPages, currentPage, ...p }: ListProps
                       <span>{h.label}</span>
                     ) : (
                       <div
-                        class="flex gap-3"
+                        class="flex gap-3 w-full"
                         hx-replace-url="true"
                         hx-get={`${context?.path}?${qs.stringify({
                           ...query,
