@@ -1,7 +1,7 @@
 import { cn } from "~/utils";
 import { formFieldBuilder, BaseInputComponent } from "~/form/*";
 import { ContextDecorated } from "~/config/decorateRequest";
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 
 export interface SelectInputProps extends Omit<JSX.HtmlSelectTag, "name" | "multiple">, BaseInputComponent {
   options: (ctx: ContextDecorated) => Array<{ value: string; label: string }>;
@@ -18,7 +18,7 @@ export const SelectInput = (props: SelectInputProps) => {
   } = formFieldBuilder(props);
 
   const errorClass = "select-error";
-  const ctx = globalContext.getStore()!;
+  const ctx = getContext();
 
   return (
     <label {...wrapperProps}>

@@ -8,14 +8,14 @@ import {
   DropdownInputProps,
   SelectInputProps,
 } from "~/form/inputs/*";
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 
 type InputProps = HxValidation &
   (TextInputProps | RadioInputProps | ToggleInputProps | DropdownInputProps | SelectInputProps);
 
 export const formFieldBuilder = <TInputProps extends InputProps>(props: TInputProps) => {
   const wrapperId = `${props.name}${ATTRIBUTES_CONSTANTS.form["inputWrapperId"]}`;
-  const context = globalContext.getStore();
+  const ctx = getContext();
   const errors = props.errors;
   const errorId = `${props.name}${ATTRIBUTES_CONSTANTS.form["inputErrorId"]}`;
 
@@ -23,8 +23,8 @@ export const formFieldBuilder = <TInputProps extends InputProps>(props: TInputPr
     inputProps: {
       ...props,
       id: `${props.name}${ATTRIBUTES_CONSTANTS.form["inputId"]}`,
-      value: (typeof context?.body !== "undefined"
-        ? (context?.body as Record<string, string>)?.[props.name]
+      value: (typeof ctx.body !== "undefined"
+        ? (ctx.body as Record<string, string>)?.[props.name]
         : props.value) as TInputProps["value"],
       ...(props.hxValidation
         ? {
@@ -40,7 +40,7 @@ export const formFieldBuilder = <TInputProps extends InputProps>(props: TInputPr
       id: wrapperId,
       ...(props.hxValidation
         ? {
-            [`hx-${props.hxValidation.method?.toLowerCase() ?? "post"}`]: props.hxValidation.url ?? context?.path,
+            "hx-post": ctx.path,
             "hx-select": `#${wrapperId}`,
             // "hx-target": "this",
             "hx-trigger":

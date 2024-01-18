@@ -1,7 +1,7 @@
 import { cn } from "~/utils";
 import { formFieldBuilder, BaseInputComponent } from "~/form/*";
 import { ContextDecorated } from "~/config/decorateRequest";
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 
 export interface RadioInputProps extends Omit<JSX.HtmlInputTag, "name">, BaseInputComponent {
   label?: string;
@@ -26,7 +26,7 @@ export const RadioInput = (props: RadioInputProps) => {
     Label,
   } = formFieldBuilder(props);
 
-  const ctx = globalContext.getStore()!;
+  const ctx = getContext();
   return (
     <label {...wrapperProps}>
       {Label}

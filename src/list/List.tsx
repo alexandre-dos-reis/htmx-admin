@@ -1,4 +1,4 @@
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 import qs from "qs";
 import { Sort, SortUp, SortDown, XMark } from "~/components/svg/*";
 import { cn } from "~/utils";
@@ -46,8 +46,8 @@ interface HeaderProps {
 }
 
 const ColumnsTitle = ({ headers }: HeaderProps) => {
-  const context = globalContext.getStore();
-  const query = context?.query as TableQuery;
+  const ctx = getContext();
+  const query = ctx?.query as TableQuery;
 
   return (
     <tr class="sticky top-[70px] z-[1] bg-base-200 border-b-2 border-b-black">
@@ -65,7 +65,7 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
               <div
                 class="flex gap-3 w-full"
                 {...hxProps}
-                hx-get={`${context?.path}?${qs.stringify({
+                hx-get={`${ctx?.path}?${qs.stringify({
                   ...query,
                   orderByName: h.queryName,
                   orderByDir: query?.orderByName === h.queryName && query.orderByDir === "asc" ? "desc" : "asc",
@@ -86,7 +86,7 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
             <XMark
               class={cn("z-[1] invisible fill-neutral-500", query?.orderByName === h.queryName && "visible")}
               {...hxProps}
-              hx-get={context?.path}
+              hx-get={ctx?.path}
             />
           </div>
         </th>
@@ -96,8 +96,8 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
 };
 
 const Pagination = (p: { pages: number[]; currentPage: number }) => {
-  const context = globalContext.getStore();
-  const query = context?.query as TableQuery;
+  const ctx = getContext();
+  const query = ctx?.query as TableQuery;
 
   return (
     <div class="w-full flex justify-center my-6">
@@ -106,7 +106,7 @@ const Pagination = (p: { pages: number[]; currentPage: number }) => {
           <button
             class={cn("join-item btn", px === p.currentPage && "btn-primary")}
             {...hxProps}
-            hx-get={`${context?.path}?${qs.stringify({ ...query, page: px })}`}
+            hx-get={`${ctx?.path}?${qs.stringify({ ...query, page: px })}`}
           >
             {px}
           </button>

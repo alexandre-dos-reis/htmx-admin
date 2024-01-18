@@ -14,7 +14,7 @@ import {
 } from "./inputs/*";
 import { Form } from "./Form";
 import { match } from "ts-pattern";
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 import { ContextDecorated } from "~/config/decorateRequest";
 import { MaybePromise, PartialExtended } from "~/utils/types";
 
@@ -78,7 +78,7 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
   const getSchemaFromDefinition = (args?: { params?: Params }): Schema => {
     return Object.keys(fields).reduce((_schema, keyOfField) => {
       return _schema.extend({
-        [keyOfField]: fields[keyOfField].schema(globalContext.getStore()!, args?.params),
+        [keyOfField]: fields[keyOfField].schema(getContext(), args?.params),
       });
     }, z.object({})) as Schema;
   };
@@ -89,7 +89,7 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
     data?: Data;
     errors?: Errors;
   }> => {
-    const context = globalContext.getStore();
+    const context = getContext();
 
     if (!context?.isMethodPost) {
       return { data: undefined, errors: undefined };
@@ -145,7 +145,7 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
     errors?: Errors;
     disableHxValidation?: boolean;
   }) => {
-    const context = globalContext.getStore();
+    const context = getContext();
 
     if (!disableHxValidation && context?.isFormValidationRequest) {
       return renderInputFromHxRequest({ errors });
@@ -187,7 +187,7 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
   };
 
   const renderInputFromHxRequest = (opts?: { errors?: Errors }) => {
-    const context = globalContext.getStore();
+    const context = getContext();
     const name = context?.inputNameRequest;
 
     if (name && name in fields) {

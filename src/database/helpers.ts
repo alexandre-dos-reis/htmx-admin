@@ -1,6 +1,7 @@
 import { ContextDecorated } from "~/config/decorateRequest";
 import { PrismaModelName } from "./client";
 import { Prisma } from "@prisma/client";
+import { getContext } from "~/config/globalStorages";
 
 type PrismaFindManyArgs<T extends PrismaModelName> = T extends "customer" ? Prisma.CustomerFindManyArgs : never;
 
@@ -24,6 +25,9 @@ export const listStateMapperToDb = async <
   modelName: TModeName;
   select?: TFindManyArgs["select"];
 }) => {
+  const ctx = getContext();
+  const search = ctx.query.search;
+
   const orderBy = sort ? { [sort?.byName]: sort?.byDirection } : undefined;
 
   const [data, totalRows] = await db.$transaction([
@@ -32,6 +36,7 @@ export const listStateMapperToDb = async <
       skip: rowsPerPage * (currentPage - 1),
       orderBy,
       select,
+      where: search ? { name: { contains: search } } : undefined,
     }),
     db[modelName].count({
       orderBy,

@@ -1,4 +1,4 @@
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 import { cn } from "../utils";
 import { ENV_VARS } from "../utils/envvars";
 import { Header } from "./Header";
@@ -16,16 +16,16 @@ const Main = (p: JSX.ElementChildrenAttribute) => (
 );
 
 export const Layout = ({ children, ...p }: JSX.HtmlBodyTag) => {
-  const context = globalContext.getStore();
+  const ctx = getContext();
 
-  if (context?.renderFragment || context?.isFormValidationRequest) {
+  if (ctx.renderFragment || ctx.isFormValidationRequest) {
     return <>{children}</>;
   }
 
-  if (context?.isHxRequest) {
+  if (ctx.isHxRequest) {
     return (
       <>
-        {context?.renderNavbar ? <Navbar /> : null}
+        {ctx.renderNavbar ? <Navbar /> : null}
         <Main>{children}</Main>
       </>
     );

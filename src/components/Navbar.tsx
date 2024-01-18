@@ -1,9 +1,8 @@
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 import { cn } from "~/utils";
-import { Home } from "./*";
 
 const NavLink = ({ href, children, class: classname, icon, ...props }: JSX.HtmlAnchorTag & { icon?: JSX.Element }) => {
-  const path = globalContext?.getStore()?.path || "";
+  const path = getContext().path || "";
   const isCurrent = href === "/" ? path === href : path.startsWith(href || "");
 
   return (

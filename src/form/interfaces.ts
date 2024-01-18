@@ -1,7 +1,5 @@
 export interface HxValidation {
   hxValidation?: {
-    method?: "put" | "post" | "get" | "delete";
-    url?: string;
     triggerOn?: "keyup" | "blur";
   };
 }

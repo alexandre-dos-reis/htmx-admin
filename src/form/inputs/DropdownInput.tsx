@@ -3,7 +3,7 @@ import { XMark } from "~/components/svg/XMark";
 import { cn } from "~/utils";
 import { formFieldBuilder, BaseInputComponent } from "~/form/*";
 import { ContextDecorated } from "~/config/decorateRequest";
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 
 export interface DropdownInputProps extends Omit<JSX.HtmlInputTag, "name" | "value">, BaseInputComponent {
   choices: (ctx: ContextDecorated) => Array<{ value: string; children: string }>;
@@ -22,7 +22,7 @@ export const DropdownInput = (props: DropdownInputProps) => {
     error: { Errors, isError, errorId },
   } = formFieldBuilder(props);
 
-  const ctx = globalContext.getStore()!;
+  const ctx = getContext();
   const choices = _choices(ctx).map((c) => ({
     ...c,
     isSelected: value?.includes(c.value) || false,

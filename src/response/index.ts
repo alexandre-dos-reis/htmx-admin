@@ -1,5 +1,4 @@
 import { HX_HEADERS_CONSTANTS } from "~/config/constants";
-import { globalContext } from "~/config/globalStorages";
 import { type AppEvent, appEventName } from "../isomorphic/event";
 
 type Set = {
@@ -11,8 +10,6 @@ type Set = {
 };
 
 export const redirectTo = (args: { to: string; set: Set }) => {
-  const context = globalContext.getStore();
-
   // this condition was not triggering the event...
   // if (context?.isHxRequest) {
   args.set.headers["HX-Location"] = JSON.stringify({

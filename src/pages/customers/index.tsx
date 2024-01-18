@@ -3,15 +3,17 @@ import { form } from "./form";
 import { decorateRequest } from "~/config/decorateRequest";
 import { notify, notifyAndRedirect } from "~/response";
 import { Layout, Link, Tabs } from "~/components/*";
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 import { createList } from "~/list/createList";
 import { listStateMapperToDb } from "~/database/helpers";
+import { TextInput } from "~/form/inputs/*";
+import { HX_HEADERS_CONSTANTS } from "~/config/constants";
 
 const { handleForm, renderForm } = form;
 
 const CustomersTabs = (p: JSX.ElementChildrenAttribute) => {
-  const context = globalContext.getStore();
-  const basePath = `/customers/${context?.params["id"]}`;
+  const ctx = getContext();
+  const basePath = `/customers/${ctx?.params["id"]}`;
 
   const tabs = [
     { href: basePath, label: "General" },
@@ -26,7 +28,7 @@ export const customers = new Elysia({ prefix: "/customers" })
   .all("/", async () => {
     const { renderList } = await createList({
       config: { defaultSorting: { byDirection: "asc", byName: "name" } },
-      loadData: (ctx, state) => listStateMapperToDb({ ctx, state, modelName: "customer", select: {} }),
+      loadData: (ctx, state) => listStateMapperToDb({ ctx, state, modelName: "customer" }),
       rowClickHref: (data) => `/customers/${data.id}`,
       columns: {
         name: {
@@ -63,14 +65,25 @@ export const customers = new Elysia({ prefix: "/customers" })
       },
     });
 
-    const ctx = globalContext.getStore();
+    const ctx = getContext();
     return (
       <Layout>
         {ctx?.renderFragment ? null : (
-          <div class="flex justify-end mb-6">
-            <Link href="/customers/create" class="btn btn-primary">
-              Create a customer
-            </Link>
+          <div class="flex items-center justify-center mb-6 gap-10">
+            <TextInput
+              label="Search by name"
+              name="search"
+              hx-trigger="input changed delay:500ms, search"
+              hx-target="#list"
+              hx-headers={JSON.stringify({ [HX_HEADERS_CONSTANTS.renderFragment]: true })}
+              hx-get={ctx?.path}
+              // _="on change set location.h to @value"
+            />
+            <div class="flex justify-end">
+              <Link href="/customers/create" class="btn btn-primary">
+                Create a customer
+              </Link>
+            </div>
           </div>
         )}
         {renderList()}

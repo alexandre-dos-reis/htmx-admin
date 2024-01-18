@@ -1,4 +1,4 @@
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 import { cn } from "../utils";
 
 interface Props extends JSX.HtmlFormTag {
@@ -9,13 +9,13 @@ interface Props extends JSX.HtmlFormTag {
 }
 
 export const Form = ({ children, submitBtnlabel, hxHeaders, ...otherProps }: Props) => {
-  const context = globalContext.getStore();
+  const ctx = getContext();
   return (
     <form
       id="form"
       novalidate
       autocomplete="off"
-      hx-post={context?.path}
+      hx-post={ctx.path}
       hx-swap="outerHTML"
       hx-replace-url="true"
       hx-headers={hxHeaders ? JSON.stringify(hxHeaders) : undefined}

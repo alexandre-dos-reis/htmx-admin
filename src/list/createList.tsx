@@ -1,6 +1,6 @@
 import { List } from "./List";
 import { ContextDecorated } from "~/config/decorateRequest";
-import { globalContext } from "~/config/globalStorages";
+import { getContext } from "~/config/globalStorages";
 import { cn, isObjectEmpty } from "~/utils";
 import { z } from "zod";
 import { MaybePromise } from "~/utils/types";
@@ -44,11 +44,11 @@ export const createList = async <
   rowClickHref?: (arg: TRow) => string;
 }) => {
   let dataConfig: LoadDataConfig<TDatas>;
-  const context = globalContext.getStore() as NonNullable<ContextDecorated>;
+  const ctx = getContext();
   let currentPage = 1;
   const rowsPerPage = config?.rowsPerPage ?? 10;
 
-  if (!isObjectEmpty(context.query)) {
+  if (!isObjectEmpty(ctx.query)) {
     const parsed = z
       .object({
         byName: z
@@ -59,16 +59,16 @@ export const createList = async <
         page: z.preprocess((v) => parseInt(String(v), 10), z.number()).optional(),
       })
       .safeParse({
-        byName: context.query["orderByName"],
-        byDirection: context.query["orderByDir"],
-        page: context.query["page"],
+        byName: ctx.query["orderByName"],
+        byDirection: ctx.query["orderByDir"],
+        page: ctx.query["page"],
       });
 
     currentPage = parsed.success ? parsed.data.page ?? 1 : 1;
 
     dataConfig = await Promise.resolve(
       loadData(
-        context,
+        ctx,
         parsed.success
           ? {
               sort:
@@ -82,7 +82,7 @@ export const createList = async <
     );
   } else {
     dataConfig = await Promise.resolve(
-      loadData(context, { sort: config?.defaultSorting, pagination: { currentPage, rowsPerPage } }),
+      loadData(ctx, { sort: config?.defaultSorting, pagination: { currentPage, rowsPerPage } }),
     );
   }
 
