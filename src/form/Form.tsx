@@ -4,6 +4,7 @@ import { HX_HEADERS_CONSTANTS } from "~/config/constants";
 
 interface Props extends JSX.HtmlFormTag {
   submitBtnlabel?: string;
+  // TODO: implement : submitAndContinueBtnlabel?: string;
   hxHeaders?: Record<string, string>;
   // renderAsFragmentRoute?: boolean;
 }

@@ -68,7 +68,7 @@ export const form = createForm({
     },
     job: {
       type: "select",
-      schema: () => z.string().min(1, "Please, select a company !"),
+      schema: () => z.string().min(1, "Please, select a job !"),
       props: {
         label: "Job",
         options: () => [

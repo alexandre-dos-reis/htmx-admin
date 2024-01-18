@@ -5,6 +5,7 @@ import { notify, notifyAndRedirect } from "~/response";
 import { Layout, Link, Tabs } from "~/components/*";
 import { globalContext } from "~/config/globalStorages";
 import { createList } from "~/list/createList";
+import { listStateMapperToDb } from "~/database/helpers";
 
 const { handleForm, renderForm } = form;
 
@@ -25,20 +26,7 @@ export const customers = new Elysia({ prefix: "/customers" })
   .all("/", async () => {
     const { renderList } = await createList({
       config: { defaultSorting: { byDirection: "asc", byName: "name" } },
-      loadData: async ({ db }, { sort, pagination: { currentPage, rowsPerPage } }) => {
-        const orderBy = sort ? { [sort?.byName]: sort?.byDirection } : undefined;
-        const [data, totalRows] = await db.$transaction([
-          db.customer.findMany({
-            take: rowsPerPage,
-            skip: rowsPerPage * (currentPage - 1),
-            orderBy,
-          }),
-          db.customer.count({
-            orderBy,
-          }),
-        ]);
-        return { data, totalRows };
-      },
+      loadData: (ctx, state) => listStateMapperToDb({ ctx, state, modelName: "customer" }),
       rowClickHref: (data) => `/customers/${data.id}`,
       columns: {
         name: {
@@ -52,13 +40,14 @@ export const customers = new Elysia({ prefix: "/customers" })
               </div>
               <div>
                 <div class="font-bold">{d.name}</div>
+                <div class="text-sm opacity-50">{d.location}</div>
               </div>
             </div>
           ),
         },
         company: {},
         job: {
-          label: "Job",
+          label: "Company / Job",
           row: (d) => (
             <>
               {d.company}
@@ -149,6 +138,11 @@ export const customers = new Elysia({ prefix: "/customers" })
         return (
           <Layout>
             <CustomersTabs>
+              <div class="avatar flex justify-center">
+                <div class="mask mask-squircle w-20 h-20">
+                  <img src={`https://i.pravatar.cc/100?u=${params.id}`} alt="Avatar Tailwind CSS Component" />
+                </div>
+              </div>
               {await renderForm({
                 errors,
                 loadDefaultValues: async ({ db }) => {
