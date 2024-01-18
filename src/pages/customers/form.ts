@@ -35,7 +35,7 @@ export const form = createForm({
       },
     },
     name: {
-      schema: z.string().min(3).max(255),
+      schema: () => z.string().min(3).max(255),
       props: {
         autocomplete: "name",
         label: "Name",
