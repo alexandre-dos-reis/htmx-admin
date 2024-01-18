@@ -57,9 +57,19 @@ export type FieldsDefinition<T extends Params = Params> = Record<
 >;
 
 export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }: { fields: TFields }) => {
-  type Schema = z.ZodObject<{
-    [Key in keyof TFields]: ReturnType<TFields[Key]["schema"]>;
-  }>;
+  type Schema = z.ZodObject<
+    {
+      [Key in keyof TFields]: ReturnType<TFields[Key]["schema"]>;
+    },
+    "strip",
+    z.ZodTypeAny,
+    {
+      [Key in keyof TFields]: z.infer<ReturnType<TFields[Key]["schema"]>>;
+    },
+    {
+      [Key in keyof TFields]: z.infer<ReturnType<TFields[Key]["schema"]>>;
+    }
+  >;
 
   type Data = z.infer<Schema>;
 
