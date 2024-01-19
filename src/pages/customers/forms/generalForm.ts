@@ -90,11 +90,26 @@ export const form = createForm({
         ],
       },
     },
-    // isActive: {
-    //   type: "toggle",
-    //   schema: () => z.coerce.boolean(),
+    // selection: {
+    //   type: "dropdown",
+    //   schema: () =>
+    //     z.preprocess(
+    //       (v) => {
+    //         console.log(v);
+    //         if (typeof v === "string") {
+    //           v = [v];
+    //         }
+    //         return (v as Array<string>).filter(Boolean);
+    //       },
+    //       z.array(z.string()).min(1, "This selection can't be empty !"),
+    //     ),
     //   props: {
-    //     label: "Active ?",
+    //     label: "test",
+    //     choices: () => [
+    //       { value: "1", children: "One" },
+    //       { value: "2", children: "Two" },
+    //       { value: "3", children: "Tree" },
+    //     ],
     //   },
     // },
   } satisfies FieldsDefinition,

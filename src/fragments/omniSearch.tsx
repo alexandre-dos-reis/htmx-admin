@@ -63,7 +63,7 @@ export const omniSearchHandler: Handler = async ({ db, query }) => {
   return (
     <div
       id="omnisearch-results"
-      class="absolute left-0 right-0 top-[60px] max-h-[calc(100vh-80px)] overflow-y-auto bg-base-300 flex flex-col rounded-xl border border-base-300 shadow-2xl"
+      class="absolute left-0 right-0 top-[55px] max-h-[calc(100vh-80px)] overflow-y-auto bg-base-300 flex flex-col rounded-xl border border-base-300 shadow-2xl"
       _="on click set #omnisearch-input.value to ''"
     >
       {results.length > 0 ? (
@@ -74,7 +74,7 @@ export const omniSearchHandler: Handler = async ({ db, query }) => {
           id="omnisearch-no-results"
           class="flex justify-start items-center gap-6 p-4 cursor-pointer hover:bg-base-200"
         >
-          No result...
+          No result.
         </div>
       )}
     </div>

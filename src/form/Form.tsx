@@ -15,7 +15,7 @@ export const Form = ({ children, submitBtnlabel, hxHeaders, ...otherProps }: Pro
       id="form"
       novalidate
       autocomplete="off"
-      hx-post={ctx.path}
+      hx-post={ctx?.path}
       hx-swap="outerHTML"
       hx-replace-url="true"
       hx-headers={hxHeaders ? JSON.stringify(hxHeaders) : undefined}

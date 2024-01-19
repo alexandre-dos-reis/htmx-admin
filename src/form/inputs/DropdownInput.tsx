@@ -77,7 +77,7 @@ export const DropdownInput = (props: DropdownInputProps) => {
             return (
               <div
                 class={cn(
-                  "text-primary-content",
+                  "text-primary-content rounded",
                   bgColors[i % bgColors.length],
                   c.isSelected ? "flex" : "hidden",
                   "items-center justify-center flex-nowrap",

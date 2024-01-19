@@ -10,8 +10,6 @@ type Set = {
 };
 
 export const redirectTo = (args: { to: string; set: Set }) => {
-  // this condition was not triggering the event...
-  // if (context?.isHxRequest) {
   args.set.headers["HX-Location"] = JSON.stringify({
     path: args.to,
     headers: {
@@ -19,11 +17,7 @@ export const redirectTo = (args: { to: string; set: Set }) => {
     },
     target: "#main",
     select: "#main",
-    // swap: "outerHTML", this is causing a conflict with elements that have oob enabled
   });
-  // } else {
-  //   args.set.redirect = args.to;
-  // }
 };
 
 export const sendEvents = ({ set, events }: { set: Set; events: Array<AppEvent> }) => {
@@ -41,6 +35,13 @@ export const sendEvent = ({ set, event }: { set: Set; event: AppEvent }) => {
 export const notifyAndRedirect = ({ message, to, set }: { to: string; set: Set; message: string }) => {
   sendEvent({ set, event: { message, name: "notify", level: "success" } });
   redirectTo({ set, to });
+};
+
+export const notifyAnError = ({ message, set }: { set: Set; message?: string }) => {
+  sendEvent({
+    set,
+    event: { message: message ?? "A problem occured, please try again later !", name: "notify", level: "error" },
+  });
 };
 
 export const notify = ({

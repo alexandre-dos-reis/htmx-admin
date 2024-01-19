@@ -3,6 +3,7 @@ import { cn } from "../utils";
 import { ENV_VARS } from "../utils/envvars";
 import { Header } from "./Header";
 import { Navbar } from "./Navbar";
+import { themes } from "../../tailwind.config";
 
 const Main = (p: JSX.ElementChildrenAttribute) => (
   <main
@@ -32,20 +33,7 @@ export const Layout = ({ children, ...p }: JSX.HtmlBodyTag) => {
   }
 
   return (
-    <html
-      lang="en"
-      id="html"
-      _="on load 
-            set @data-theme to localStorage.theme or 'light' then
-            if @data-theme is 'dark' 
-                add .swap-on to #moon
-                add .swap-off to #sun
-            else
-                add .swap-on to #sun
-                add .swap-off to #moon
-            end
-      "
-    >
+    <html lang="en" id="html" _={`on load set @data-theme to localStorage.theme or '${themes[0]}'`}>
       <head>
         <link href="/public/assets/css/index.css" rel="stylesheet" />
         {Bun.env.APP_ENV === "development" ? (

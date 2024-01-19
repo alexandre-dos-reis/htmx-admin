@@ -1,6 +1,6 @@
 import { Handler } from "~/config/decorateRequest";
 import { form } from "../forms/generalForm";
-import { notify, notifyAndRedirect } from "~/response";
+import { notifyAnError, notifyAndRedirect } from "~/responses";
 import { Layout } from "~/components/*";
 import { CustomersTabs } from "../components/CustomersTabs";
 
@@ -22,12 +22,9 @@ export const edit: Handler = async ({ set, isFormSubmitted, db, params }) => {
         to: "/customers",
         message: "Changes saved successfully !",
       });
-    } catch (error) {
-      notify({
-        set,
-        level: "error",
-        message: "A problem occured, please try again later !",
-      });
+    } catch (e) {
+      console.error(e);
+      notifyAnError({ set });
     }
   }
 

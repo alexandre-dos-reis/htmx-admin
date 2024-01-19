@@ -23,9 +23,7 @@ export const formFieldBuilder = <TInputProps extends InputProps>(props: TInputPr
     inputProps: {
       ...props,
       id: `${props.name}${ATTRIBUTES_CONSTANTS.form["inputId"]}`,
-      value: (typeof ctx.body !== "undefined"
-        ? (ctx.body as Record<string, string>)?.[props.name]
-        : props.value) as TInputProps["value"],
+      value: (ctx?.body ? (ctx?.body as Record<string, string>)?.[props.name] : props.value) as TInputProps["value"],
       ...(props.hxValidation
         ? {
             "hx-sync": "closest form:abort",
@@ -40,7 +38,7 @@ export const formFieldBuilder = <TInputProps extends InputProps>(props: TInputPr
       id: wrapperId,
       ...(props.hxValidation
         ? {
-            "hx-post": ctx.path,
+            "hx-post": ctx?.path,
             "hx-select": `#${wrapperId}`,
             // "hx-target": "this",
             "hx-trigger":
