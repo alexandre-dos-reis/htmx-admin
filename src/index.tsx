@@ -7,6 +7,7 @@ import { html } from "@elysiajs/html";
 import { ENV_VARS } from "./utils/envvars";
 import { customers } from "./pages/customers";
 import { Error } from "./components/Error";
+import { fragments } from "./fragments";
 
 export const app = new Elysia()
   .use(html())
@@ -14,6 +15,7 @@ export const app = new Elysia()
   .use(decorateRequest)
   .use(globals)
   // Routes
+  .use(fragments)
   .use(customers)
   .all("/", () => <Layout>Home</Layout>)
   .get("/shop", () => <Layout>Shop</Layout>)

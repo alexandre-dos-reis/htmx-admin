@@ -3,6 +3,7 @@ import { DropDown } from "./Dropdown";
 import { ThemeController } from "./ThemeController";
 import { Link } from "./Link";
 import { HX_HEADERS_CONSTANTS } from "~/config/constants";
+import { OmniSearch } from "~/fragments/handlers/omniSearchHandler";
 
 export const Header = () => {
   return (
@@ -17,7 +18,8 @@ export const Header = () => {
           <span class="italic text-primary">htmx</span> Admin
         </Link>
       </div>
-      <div class="gap-x-3 flex items-center">
+      <div class="gap-x-5 flex items-center">
+        <OmniSearch />
         <div>
           <ThemeController />
         </div>

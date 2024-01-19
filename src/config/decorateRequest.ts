@@ -40,3 +40,4 @@ const decorate = ({ request }: Context) => {
 export const decorateRequest = new Elysia().derive((ctx) => decorate(ctx));
 
 export type ContextDecorated = ReturnType<typeof decorate> & Context;
+export type Handler = (ctx: ContextDecorated) => JSX.Element;
