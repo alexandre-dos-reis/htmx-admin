@@ -25,7 +25,7 @@ tasks:
 
   bun:dev:
     cmds:
-      - APP_ENV="development" PORT={{.SERVER_PORT}} VITE_PORT={{.VITE_PORT}} bun run --watch src/index.tsx
+      - APP_ENV="development" APP_PORT={{.SERVER_PORT}} VITE_PORT={{.VITE_PORT}} bun run --watch src/index.tsx
 
   bun:build:
     cmds:

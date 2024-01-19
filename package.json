@@ -5,6 +5,7 @@
     "@elysiajs/html": "^0.7.3",
     "@elysiajs/static": "^0.8.1",
     "@prisma/client": "^5.8.1",
+    "@t3-oss/env-core": "^0.7.3",
     "clsx": "^2.0.0",
     "elysia": "latest",
     "qs": "^6.11.2",
