@@ -3,6 +3,7 @@ import { formFieldBuilder, BaseInputComponent, HxValidation } from "~/form/*";
 
 export interface TextInputProps extends Omit<JSX.HtmlInputTag, "name" | "type">, BaseInputComponent, HxValidation {
   type?: JSX.HtmlInputTag["type"] | "textarea";
+  _?: string;
 }
 
 export const TextInput = (props: TextInputProps) => {

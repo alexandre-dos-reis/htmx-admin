@@ -58,7 +58,7 @@ export const list: Handler = async () => {
             hx-target="#list"
             hx-headers={JSON.stringify({ [HX_HEADERS_CONSTANTS.renderFragment]: true })}
             hx-get={ctx?.path}
-            // _="on change set location.h to @value"
+            _="on input call setParam('filterByName', event.target.value)"
           />
           <div class="flex justify-end">
             <Link href="/customers/create" class="btn btn-primary">
