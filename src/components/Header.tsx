@@ -3,7 +3,7 @@ import { DropDown } from "./Dropdown";
 import { ThemeController } from "./ThemeController";
 import { Link } from "./Link";
 import { HX_HEADERS_CONSTANTS } from "~/config/constants";
-import { OmniSearch } from "~/fragments/handlers/omniSearchHandler";
+import { OmniSearch } from "~/fragments/omniSearch";
 
 export const Header = () => {
   return (

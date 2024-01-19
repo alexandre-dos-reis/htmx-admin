@@ -29,9 +29,9 @@ export const OmniSearch = () => {
 export const omniSearchHandler: Handler = async ({ db, query }) => {
   const search = query.omnisearch || "";
 
-  let results: Array<{ element: JSX.Element }> = [];
+  let results: Array<JSX.Element> = [];
 
-  if (search.length > 1) {
+  if (search.length > 0) {
     const [customers] = await db.$transaction([
       db.customer.findMany({
         where: {
@@ -42,35 +42,40 @@ export const omniSearchHandler: Handler = async ({ db, query }) => {
       }),
     ]);
 
-    results = customers.map((c) => ({
-      element: (
-        <a
-          hx-get={`/customers/${c.id}`}
-          hx-push-url="true"
-          hx-replace-url="true"
-          class="flex justify-start items-center gap-6 p-1 cursor-pointer hover:bg-base-200"
-        >
-          <div class="avatar">
-            <div class="mask mask-squircle w-12 h-12">
-              <img src={`https://i.pravatar.cc/50?u=${c.id}`} alt="Avatar Tailwind CSS Component" />
-            </div>
+    results = customers.map((c) => (
+      <Link
+        href={`/customers/${c.id}`}
+        class="flex justify-start px-5 py-2 items-center gap-6 p-1 cursor-pointer hover:bg-base-200"
+      >
+        <div class="avatar">
+          <div class="mask mask-squircle w-12 h-12">
+            <img src={`https://i.pravatar.cc/50?u=${c.id}`} alt="Avatar Tailwind CSS Component" />
           </div>
+        </div>
+        <div class="flex flex-col">
           {c.name}
-        </a>
-      ),
-    }));
+          <span class="badge badge-ghost badge-sm">Customer</span>
+        </div>
+      </Link>
+    ));
   }
 
   return (
     <div
       id="omnisearch-results"
-      class="absolute left-0 right-0 top-[60px] bg-base-300 w-60 flex flex-col rounded-xl border border-base-300 shadow-2xl"
-      _="on click hide #omnisearch-results then set #omnisearch-input.value to ''"
+      class="absolute left-0 right-0 top-[60px] max-h-[calc(100vh-80px)] overflow-y-auto bg-base-300 flex flex-col rounded-xl border border-base-300 shadow-2xl"
+      _="on click set #omnisearch-input.value to ''"
     >
-      {results.length !== 0 ? (
-        results.map((r) => r.element)
+      {results.length > 0 ? (
+        results
       ) : (
-        <div class="on intersection(intersecting) having threshold 0 hide #omnisearch-results">No result.</div>
+        <div
+          data-no-results="true"
+          id="omnisearch-no-results"
+          class="flex justify-start items-center gap-6 p-4 cursor-pointer hover:bg-base-200"
+        >
+          No result...
+        </div>
       )}
     </div>
   );

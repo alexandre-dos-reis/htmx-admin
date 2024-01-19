@@ -68,7 +68,12 @@ export const Layout = ({ children, ...p }: JSX.HtmlBodyTag) => {
         </script>
         <title>Input validation</title>
       </head>
-      <body hx-ext="head-support, preload" class={cn("relative min-h-screen flex flex-col overflow-y-scroll")} {...p}>
+      <body
+        hx-ext="head-support, preload"
+        class={cn("relative min-h-screen flex flex-col overflow-y-scroll")}
+        {...p}
+        _="on click hide #omnisearch-results"
+      >
         <Header />
         <div class={cn("grid grid-cols-[min-content_auto]")}>
           <Navbar />
