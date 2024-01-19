@@ -1,0 +1,40 @@
+import { Layout } from "~/components/*";
+import { Handler } from "~/config/decorateRequest";
+import { notify, notifyAndRedirect } from "~/response";
+import { form } from "../forms/generalForm";
+
+const { handleForm, renderForm } = form;
+
+export const create: Handler = async ({ isFormSubmitted, db, set }) => {
+  const { data, errors } = await handleForm();
+
+  if (isFormSubmitted && data) {
+    try {
+      const c = await db.customer.create({
+        data,
+        select: { id: true },
+      });
+
+      return notifyAndRedirect({
+        set,
+        to: `/customers/${c.id}`,
+        message: "Creation saved successfully !",
+      });
+    } catch (error) {
+      notify({
+        set,
+        level: "error",
+        message: "A problem occured, please try again later !",
+      });
+    }
+    return;
+  }
+
+  return (
+    <Layout>
+      {renderForm({
+        errors,
+      })}
+    </Layout>
+  );
+};

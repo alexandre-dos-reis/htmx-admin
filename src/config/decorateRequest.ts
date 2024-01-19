@@ -1,6 +1,7 @@
 import { Context, Elysia } from "elysia";
 import { ATTRIBUTES_CONSTANTS, HX_HEADERS_CONSTANTS } from "./constants";
 import { prisma } from "~/database/client";
+import { MaybePromise } from "~/utils/types";
 
 const decorate = ({ request }: Context) => {
   const isMethodPost = request.method === "POST";
@@ -40,4 +41,7 @@ const decorate = ({ request }: Context) => {
 export const decorateRequest = new Elysia().derive((ctx) => decorate(ctx));
 
 export type ContextDecorated = ReturnType<typeof decorate> & Context;
-export type Handler = (ctx: ContextDecorated) => JSX.Element;
+
+export type Handler = (
+  ctx: Omit<ContextDecorated, "params"> & { params: Record<string, string> },
+) => MaybePromise<JSX.Element | void>;
