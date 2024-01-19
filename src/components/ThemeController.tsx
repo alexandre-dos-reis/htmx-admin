@@ -1,4 +1,4 @@
-import { themes } from "../../tailwind.config";
+import { defaultTheme, themes } from "../../tailwind.config";
 
 export const ThemeController = () => (
   <div class="dropdown">
@@ -31,7 +31,7 @@ export const ThemeController = () => (
                   if localStorage.theme exists
                     if localStorage.theme is '${t}' set @checked to true end
                   else 
-                    if my value is '${themes[0]}' set @checked to true then set localStorage.theme to '${themes[0]}' end
+                    if my value is '${defaultTheme}' set @checked to true then set localStorage.theme to '${defaultTheme}' end
                 end
             `}
           />

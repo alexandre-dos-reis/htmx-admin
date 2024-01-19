@@ -1,7 +1,9 @@
 import { Config } from "tailwindcss";
 
+export const defaultTheme = "light";
+
 export const themes = [
-  "light",
+  defaultTheme,
   "dark",
   "synthwave",
   "retro",

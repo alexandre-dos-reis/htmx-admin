@@ -3,7 +3,7 @@ import { cn } from "../utils";
 import { ENV_VARS } from "../utils/envvars";
 import { Header } from "./Header";
 import { Navbar } from "./Navbar";
-import { themes } from "../../tailwind.config";
+import { defaultTheme } from "../../tailwind.config";
 
 const Main = (p: JSX.ElementChildrenAttribute) => (
   <main
@@ -33,7 +33,7 @@ export const Layout = ({ children, ...p }: JSX.HtmlBodyTag) => {
   }
 
   return (
-    <html lang="en" id="html" _={`on load set @data-theme to localStorage.theme or '${themes[0]}'`}>
+    <html lang="en" id="html" _={`on load set @data-theme to localStorage.theme or '${defaultTheme}'`}>
       <head>
         <link href="/public/assets/css/index.css" rel="stylesheet" />
         {Bun.env.APP_ENV === "development" ? (

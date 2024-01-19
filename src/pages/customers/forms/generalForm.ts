@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { FieldsDefinition, createForm } from "~/form/createForm";
 
+// https://github.com/alexandre-dos-reis/htmx-form-validation/blob/vite/src/pages/customers/form.ts
 export const form = createForm({
   fields: {
     email: {
