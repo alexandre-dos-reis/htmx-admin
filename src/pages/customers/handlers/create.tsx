@@ -6,8 +6,10 @@ import { notifyAnError } from "~/responses";
 
 const { handleForm, renderForm } = form;
 
-export const create: Handler = async ({ isFormSubmitted, db, set }) => {
+export const create: Handler = async ({ isFormSubmitted, db, set, body }) => {
   const { data, errors } = await handleForm();
+
+  console.log({ errors, body });
 
   if (isFormSubmitted && data) {
     try {

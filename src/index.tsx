@@ -7,12 +7,17 @@ import { html } from "@elysiajs/html";
 import { ENV_VARS } from "./utils/envvars";
 import { customers } from "./pages/customers";
 import { fragments } from "./fragments";
+import { notifyAnError } from "./responses";
 
 export const app = new Elysia()
   .use(html())
   .use(staticPlugin({ assets: "public", prefix: "public" }))
   .use(decorateRequest)
   .use(globals)
+  .onError(({ set, code, error }) => {
+    // console.log({ code, error });
+    notifyAnError({ set, message: error.message });
+  })
   // Routes
   .use(fragments)
   .use(customers)

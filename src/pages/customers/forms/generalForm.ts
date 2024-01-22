@@ -1,31 +1,27 @@
-import { z } from "zod";
 import { FieldsDefinition, createForm } from "~/form/createForm";
+import { zArray, zChoice, zEmail, zStringRequired } from "~/form/schemas";
 
 // https://github.com/alexandre-dos-reis/htmx-form-validation/blob/vite/src/pages/customers/form.ts
 export const form = createForm({
   fields: {
     email: {
       schema: ({ db }, params) => {
-        return z
-          .string()
-          .email()
-          .max(255)
-          .refine(
-            async (email) =>
-              !(await db.customer.count({
-                where: params
-                  ? {
-                      AND: {
-                        email,
-                        NOT: { id: params?.currentRecordId },
-                      },
-                    }
-                  : { email },
-              })),
-            {
-              message: "Email is already taken",
-            },
-          );
+        return zEmail.refine(
+          async (email) =>
+            !(await db.customer.count({
+              where: params
+                ? {
+                    AND: {
+                      email,
+                      NOT: { id: params?.currentRecordId },
+                    },
+                  }
+                : { email },
+            })),
+          {
+            message: "Email is already taken",
+          },
+        );
       },
       props: {
         autocomplete: "email",
@@ -36,7 +32,7 @@ export const form = createForm({
       },
     },
     name: {
-      schema: () => z.string().min(3).max(255),
+      schema: () => zStringRequired,
       props: {
         autocomplete: "name",
         label: "Name",
@@ -46,7 +42,7 @@ export const form = createForm({
       },
     },
     location: {
-      schema: () => z.string().min(3).max(255),
+      schema: () => zStringRequired,
       props: {
         autocomplete: "name",
         label: "Location",
@@ -57,7 +53,7 @@ export const form = createForm({
     },
     company: {
       type: "select",
-      schema: () => z.string().min(1, "Please, select a company !"),
+      schema: () => zChoice,
       props: {
         label: "Company",
         options: () => [
@@ -69,7 +65,7 @@ export const form = createForm({
     },
     job: {
       type: "select",
-      schema: () => z.string().min(1, "Please, select a job !"),
+      schema: () => zChoice,
       props: {
         label: "Job",
         options: () => [
@@ -81,7 +77,7 @@ export const form = createForm({
     },
     color: {
       type: "select",
-      schema: () => z.string().min(1, "Please, select a color !"),
+      schema: () => zChoice,
       props: {
         label: "Color",
         options: () => [
@@ -91,27 +87,5 @@ export const form = createForm({
         ],
       },
     },
-    // selection: {
-    //   type: "dropdown",
-    //   schema: () =>
-    //     z.preprocess(
-    //       (v) => {
-    //         console.log(v);
-    //         if (typeof v === "string") {
-    //           v = [v];
-    //         }
-    //         return (v as Array<string>).filter(Boolean);
-    //       },
-    //       z.array(z.string()).min(1, "This selection can't be empty !"),
-    //     ),
-    //   props: {
-    //     label: "test",
-    //     choices: () => [
-    //       { value: "1", children: "One" },
-    //       { value: "2", children: "Two" },
-    //       { value: "3", children: "Tree" },
-    //     ],
-    //   },
-    // },
   } satisfies FieldsDefinition,
 });

@@ -9,10 +9,13 @@ const { handleForm, renderForm } = form;
 export const edit: Handler = async ({ set, isFormSubmitted, db, params }) => {
   const { data, errors } = await handleForm({ currentRecordId: params["id"] });
 
+  console.log({ errors });
+
   if (isFormSubmitted && data) {
+    const { selection, ...otherData } = data;
     try {
       await db.customer.update({
-        data,
+        data: otherData,
         where: { id: params["id"] },
         select: { id: true },
       });
@@ -24,7 +27,6 @@ export const edit: Handler = async ({ set, isFormSubmitted, db, params }) => {
       });
     } catch (e) {
       console.error(e);
-      notifyAnError({ set });
     }
   }
 
