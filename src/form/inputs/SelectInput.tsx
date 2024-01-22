@@ -4,7 +4,7 @@ import { ContextDecorated } from "~/config/decorateRequest";
 import { getContext } from "~/config/globalStorages";
 
 export interface SelectInputProps extends Omit<JSX.HtmlSelectTag, "name" | "multiple">, BaseInputComponent {
-  options: (ctx: ContextDecorated) => Array<{ value: string; label: string }>;
+  options: (ctx?: ContextDecorated) => Array<{ value: string; label: string }>;
   value?: string;
   defaultOptionLabel?: string;
 }

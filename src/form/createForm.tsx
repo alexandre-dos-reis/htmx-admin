@@ -17,15 +17,16 @@ import { match } from "ts-pattern";
 import { getContext } from "~/config/globalStorages";
 import { ContextDecorated } from "~/config/decorateRequest";
 import { MaybePromise, PartialExtended } from "~/utils/types";
+import { wrapSchemaWithPreProcess } from "./preProcesses";
 
 export type FieldError = Array<string> | undefined;
 export type AnonFormErrors = Record<string, FieldError> | undefined;
 
 type OmitName<TProps extends { name: string }> = Omit<TProps, "name">;
 
-type Params = { currentRecordId: string };
+export type Params = { currentRecordId: string };
 
-type LoadSchema<T extends Params> = (context: NonNullable<ContextDecorated>, params?: T) => z.ZodTypeAny;
+type LoadSchema<T extends Params> = (ctx: ContextDecorated, params?: T) => z.ZodTypeAny;
 
 type PropsPerType =
   | {
@@ -75,10 +76,11 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
 
   type Errors = Partial<Record<keyof Data, FieldError>>;
 
-  const getSchemaFromDefinition = (args?: { params?: Params }): Schema => {
-    return Object.keys(fields).reduce((_schema, keyOfField) => {
-      return _schema.extend({
-        [keyOfField]: fields[keyOfField].schema(getContext(), args?.params),
+  const getSchemaFromDefinition = (args?: { params?: Params }) => {
+    return Object.keys(fields).reduce((formSchema, keyOfField) => {
+      const { type, schema: loadSchema } = fields[keyOfField];
+      return formSchema.extend({
+        [keyOfField]: wrapSchemaWithPreProcess({ type, schema: loadSchema(getContext()!, args?.params) }),
       });
     }, z.object({})) as Schema;
   };
@@ -145,13 +147,13 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
     errors?: Errors;
     disableHxValidation?: boolean;
   }) => {
-    const context = getContext();
+    const ctx = getContext();
 
-    if (!disableHxValidation && context?.isFormValidationRequest) {
+    if (!disableHxValidation && ctx?.isFormValidationRequest) {
       return renderInputFromHxRequest({ errors });
     }
 
-    const defaultValues = context?.isMethodGet ? await loadDefaultValues?.(context) : undefined;
+    const defaultValues = await loadDefaultValues?.(ctx!);
 
     return (
       <Form {...formProps}>
@@ -163,7 +165,7 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
               type: type as any,
               props: {
                 ...props,
-                value: (context?.isMethodGet && defaultValues ? defaultValues?.[name] : undefined) as  // Remove null
+                value: (ctx?.isMethodGet && defaultValues ? defaultValues?.[name] : undefined) as  // Remove null
                   | NonNullable<(typeof defaultValues)[keyof typeof defaultValues]>
                   | undefined,
                 errors: errors?.[name],

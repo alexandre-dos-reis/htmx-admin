@@ -5,7 +5,7 @@ import { getContext } from "~/config/globalStorages";
 
 export interface RadioInputProps extends Omit<JSX.HtmlInputTag, "name">, BaseInputComponent {
   label?: string;
-  choices: (ctx: ContextDecorated) => Array<{ value: string; children: JSX.Element }>;
+  choices: (ctx?: ContextDecorated) => Array<{ value: string; children: JSX.Element }>;
 }
 
 const colors = [
