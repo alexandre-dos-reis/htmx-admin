@@ -21,7 +21,7 @@ export const OmniSearch = () => {
         hx-include="this"
         hx-indicator="#omnisearch-loader"
       />
-      <div id="omnisearch-results"></div>
+      <ul id="omnisearch-results"></ul>
     </div>
   );
 };
@@ -43,40 +43,41 @@ export const omniSearchHandler: Handler = async ({ db, query }) => {
     ]);
 
     results = customers.map((c) => (
-      <Link
-        href={`/customers/${c.id}`}
-        class="flex justify-start px-5 py-2 items-center gap-6 p-1 cursor-pointer hover:bg-base-200"
-      >
-        <div class="avatar">
-          <div class="mask mask-squircle w-12 h-12">
-            <img src={`https://i.pravatar.cc/50?u=${c.id}`} alt="Avatar Tailwind CSS Component" />
+      <li>
+        <Link
+          href={`/customers/${c.id}`}
+          class="flex justify-start px-5 py-2 items-center gap-6 p-1 cursor-pointer hover:bg-neutral rounded-xl"
+        >
+          <div class="avatar">
+            <div class="mask mask-squircle w-12 h-12">
+              <img src={`https://i.pravatar.cc/50?u=${c.id}`} alt="Avatar Tailwind CSS Component" />
+            </div>
           </div>
-        </div>
-        <div class="flex flex-col">
-          {c.name}
-          <span class="badge badge-ghost badge-sm">Customer</span>
-        </div>
-      </Link>
+          <div class="flex flex-col">
+            {c.name}
+            <span class="badge badge-ghost badge-sm">Customer</span>
+          </div>
+        </Link>
+      </li>
     ));
   }
 
   return (
-    <div
+    <ul
       id="omnisearch-results"
-      class="absolute left-0 right-0 top-[55px] max-h-[calc(100vh-80px)] overflow-y-auto bg-base-300 flex flex-col rounded-xl border border-base-300 shadow-2xl"
+      class="absolute left-0 right-0 top-[55px] max-h-[calc(100vh-80px)] overflow-y-auto bg-base-300 flex flex-col rounded-xl border border-base-300 shadow-2xl p-2"
       _="on click set #omnisearch-input.value to ''"
     >
       {results.length > 0 ? (
         results
       ) : (
-        <div
-          data-no-results="true"
+        <li
           id="omnisearch-no-results"
           class="flex justify-start items-center gap-6 p-4 cursor-pointer hover:bg-base-200"
         >
           No result.
-        </div>
+        </li>
       )}
-    </div>
+    </ul>
   );
 };
