@@ -1,7 +1,7 @@
 import { ZodTypeAny, z } from "zod";
 import { FieldsDefinition, Params } from "./createForm";
 
-const ArrayPreProcess = (schema: z.ZodTypeAny) =>
+const arrayPreProcess = (schema: z.ZodTypeAny) =>
   z.preprocess((v) => {
     const array = Array.isArray(v) ? v : [v];
     return array.filter(Boolean);
@@ -16,7 +16,7 @@ export const wrapSchemaWithPreProcess = <TField extends FieldsDefinition<Params>
 }) => {
   switch (type) {
     case "dropdown":
-      return ArrayPreProcess(schema);
+      return arrayPreProcess(schema);
     default:
       return schema;
   }
