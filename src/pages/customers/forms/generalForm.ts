@@ -26,6 +26,7 @@ export const form = createForm({
       props: {
         autocomplete: "email",
         label: "Email",
+        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         hxValidation: {
           triggerOn: "blur",
         },
@@ -34,6 +35,7 @@ export const form = createForm({
     name: {
       schema: () => zStringRequired,
       props: {
+        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         autocomplete: "name",
         label: "Name",
         hxValidation: {
@@ -44,6 +46,7 @@ export const form = createForm({
     location: {
       schema: () => zStringRequired,
       props: {
+        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         autocomplete: "name",
         label: "Location",
         hxValidation: {
@@ -55,6 +58,7 @@ export const form = createForm({
       type: "select",
       schema: () => zChoice,
       props: {
+        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         label: "Company",
         options: () => [
           { label: "Google", value: "google" },
@@ -67,6 +71,7 @@ export const form = createForm({
       type: "select",
       schema: () => zChoice,
       props: {
+        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         label: "Job",
         options: () => [
           { label: "Dev", value: "dev" },
@@ -79,11 +84,24 @@ export const form = createForm({
       type: "select",
       schema: () => zChoice,
       props: {
+        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         label: "Color",
         options: () => [
           { label: "Red", value: "red" },
           { label: "Blue", value: "blue" },
           { label: "Black", value: "black" },
+        ],
+      },
+    },
+    selection: {
+      type: "dropdown",
+      schema: () => zArray,
+      props: {
+        colspanClass: "col-span-12",
+        label: "Selection",
+        choices: () => [
+          { value: "some", children: "some" },
+          { value: "test", children: "test" },
         ],
       },
     },
