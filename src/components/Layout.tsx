@@ -19,14 +19,14 @@ const Main = (p: JSX.ElementChildrenAttribute) => (
 export const Layout = ({ children, ...p }: JSX.HtmlBodyTag) => {
   const ctx = getContext();
 
-  if (ctx.renderFragment || ctx.isFormValidationRequest) {
+  if (ctx?.renderFragment || ctx?.isFormValidationRequest) {
     return <>{children}</>;
   }
 
-  if (ctx.isHxRequest) {
+  if (ctx?.isHxRequest) {
     return (
       <>
-        {ctx.renderNavbar ? <Navbar /> : null}
+        {ctx?.renderNavbar ? <Navbar /> : null}
         <Main>{children}</Main>
       </>
     );

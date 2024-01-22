@@ -8,10 +8,10 @@ export const Tabs = (p: JSX.ElementChildrenAttribute & { tabs: Array<{ href: str
 
   return (
     <>
-      {!ctx.renderFragment && (
+      {!ctx?.renderFragment && (
         <div role="tablist" class="tabs tabs-boxed mb-16">
           {p.tabs.map((t) => {
-            const isActive = ctx.path === t.href;
+            const isActive = ctx?.path === t.href;
             return (
               <Link
                 href={t.href}

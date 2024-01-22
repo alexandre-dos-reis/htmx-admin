@@ -2,7 +2,7 @@ import { getContext } from "~/config/globalStorages";
 import { cn } from "~/utils";
 
 const NavLink = ({ href, children, class: classname, icon, ...props }: JSX.HtmlAnchorTag & { icon?: JSX.Element }) => {
-  const path = getContext().path || "";
+  const path = getContext()?.path || "";
   const isCurrent = href === "/" ? path === href : path.startsWith(href || "");
 
   return (
