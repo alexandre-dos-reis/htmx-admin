@@ -33,7 +33,7 @@ export const formFieldBuilder = <TInputProps extends InputProps>(props: TInputPr
     wrapperProps: {
       class: cn(
         "form-control w-full h-fit relative pb-7",
-        props.wrapperClass ?? "col-span-12 lg:col-span-6 xl:col-span-4",
+        props.colspanClass ?? "col-span-12 lg:col-span-6 xl:col-span-4",
       ),
       id: wrapperId,
       ...(props.hxValidation

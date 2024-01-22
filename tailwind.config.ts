@@ -18,7 +18,7 @@ export const themes = [
 ];
 
 export default {
-  content: ["./src/**/*.tsx"],
+  content: ["./src/**/*.{tsx,ts}"],
   theme: {
     extend: {},
   },
