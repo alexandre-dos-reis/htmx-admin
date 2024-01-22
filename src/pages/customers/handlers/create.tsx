@@ -2,14 +2,11 @@ import { Layout } from "~/components/*";
 import { Handler } from "~/config/decorateRequest";
 import { notifyAndRedirect } from "~/responses";
 import { form } from "../forms/generalForm";
-import { notifyAnError } from "~/responses";
 
 const { handleForm, renderForm } = form;
 
-export const create: Handler = async ({ isFormSubmitted, db, set, body }) => {
+export const create: Handler = async ({ isFormSubmitted, db, set }) => {
   const { data, errors } = await handleForm();
-
-  console.log({ errors, body });
 
   if (isFormSubmitted && data) {
     try {
@@ -25,9 +22,6 @@ export const create: Handler = async ({ isFormSubmitted, db, set, body }) => {
       });
     } catch (e) {
       console.log(e);
-      notifyAnError({
-        set,
-      });
     }
     return;
   }

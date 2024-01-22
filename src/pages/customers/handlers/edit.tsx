@@ -1,6 +1,6 @@
 import { Handler } from "~/config/decorateRequest";
 import { form } from "../forms/generalForm";
-import { notifyAnError, notifyAndRedirect } from "~/responses";
+import { notifyAndRedirect } from "~/responses";
 import { Layout } from "~/components/*";
 import { CustomersTabs } from "../components/CustomersTabs";
 
@@ -9,13 +9,10 @@ const { handleForm, renderForm } = form;
 export const edit: Handler = async ({ set, isFormSubmitted, db, params }) => {
   const { data, errors } = await handleForm({ currentRecordId: params["id"] });
 
-  console.log({ errors });
-
   if (isFormSubmitted && data) {
-    const { selection, ...otherData } = data;
     try {
       await db.customer.update({
-        data: otherData,
+        data,
         where: { id: params["id"] },
         select: { id: true },
       });
