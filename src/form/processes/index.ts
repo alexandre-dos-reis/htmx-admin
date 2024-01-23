@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 import { FieldDef } from "../createForm";
 import { arrayPreProcess } from "./preProcesses";
-import { oneIsAllowedPostProcess, multipleValueAllowedPostProcess } from "./postProcesses";
+import { oneIsAllowedPostProcess, multipleValueAllowedPostProcess, dedupValuesPostProcess } from "./postProcesses";
 import { z } from "zod";
 
 export const appendSchemaProcess = ({ field }: { field: FieldDef }) => {
@@ -20,9 +20,12 @@ export const appendSchemaProcess = ({ field }: { field: FieldDef }) => {
     })
     .with({ type: "dropdown" }, ({ schema, props }) => {
       return arrayPreProcess(
-        multipleValueAllowedPostProcess({
-          schema: schema as z.ZodArray<z.ZodString, "many">,
-          choices: props.choices.map((c) => ({ value: c.value, label: c.errorLabel ?? c.value })),
+        dedupValuesPostProcess({
+          // @ts-ignore
+          schema: multipleValueAllowedPostProcess({
+            schema: schema as z.ZodArray<z.ZodString, "many">,
+            choices: props.choices.map((c) => ({ value: c.value, label: c.errorLabel ?? c.value })),
+          }),
         }),
       );
     })

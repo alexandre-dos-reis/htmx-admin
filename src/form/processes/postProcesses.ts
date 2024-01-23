@@ -17,12 +17,6 @@ export const multipleValueAllowedPostProcess = (args: {
   });
 };
 
-// export const capValuesLengthPostProcess = (args: { schema: z.ZodArray<z.ZodString, "many">; choices: Choices }) => {
-//   return args.schema.refine((v) => v);
-// };
-
-export const distinctValuesPostProcess = (args: { schema: z.ZodArray<z.ZodString, "many">; choices: Choices }) => {
-  return args.schema.refine((vx) => vx.some((v) => args.choices.map((a) => a.value).includes(v)), {
-    message: `Only these values are allowed among: ${args.choices.map((a) => a.label).join(", ")}.`,
-  });
+export const dedupValuesPostProcess = (args: { schema: z.ZodArray<z.ZodString, "many"> }) => {
+  return args.schema.transform((v) => [...new Set(v)]);
 };
