@@ -1,28 +1,26 @@
-import { FieldsDefinition, createForm } from "~/form/createForm";
+import { createForm, FieldsDefinition } from "~/form/createForm";
 import { zArray, zChoice, zEmail, zStringRequired } from "~/form/schemas";
 
 // https://github.com/alexandre-dos-reis/htmx-form-validation/blob/vite/src/pages/customers/form.ts
 export const form = createForm({
-  fields: {
+  loadFields: ({ db }, args) => ({
     email: {
-      schema: ({ db }, params) => {
-        return zEmail.refine(
-          async (email) =>
-            !(await db.customer.count({
-              where: params
-                ? {
-                    AND: {
-                      email,
-                      NOT: { id: params?.currentRecordId },
-                    },
-                  }
-                : { email },
-            })),
-          {
-            message: "Email is already taken",
-          },
-        );
-      },
+      schema: zEmail.refine(
+        async (email) =>
+          !(await db.customer.count({
+            where: args?.editModelId
+              ? {
+                  AND: {
+                    email,
+                    NOT: { id: `${args.editModelId}` },
+                  },
+                }
+              : { email },
+          })),
+        {
+          message: "Email is already taken",
+        },
+      ),
       props: {
         autocomplete: "email",
         label: "Email",
@@ -33,7 +31,7 @@ export const form = createForm({
       },
     },
     name: {
-      schema: () => zStringRequired,
+      schema: zStringRequired,
       props: {
         colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         autocomplete: "name",
@@ -44,7 +42,7 @@ export const form = createForm({
       },
     },
     location: {
-      schema: () => zStringRequired,
+      schema: zStringRequired,
       props: {
         colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         autocomplete: "name",
@@ -56,7 +54,7 @@ export const form = createForm({
     },
     company: {
       type: "select",
-      schema: () => zChoice,
+      schema: zChoice,
       props: {
         colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         label: "Company",
@@ -69,7 +67,7 @@ export const form = createForm({
     },
     job: {
       type: "select",
-      schema: () => zChoice,
+      schema: zChoice,
       props: {
         colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         label: "Job",
@@ -82,7 +80,7 @@ export const form = createForm({
     },
     color: {
       type: "select",
-      schema: () => zChoice,
+      schema: zChoice,
       props: {
         colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
         label: "Color",
@@ -95,7 +93,7 @@ export const form = createForm({
     },
     selection: {
       type: "dropdown",
-      schema: () => zArray,
+      schema: zArray,
       props: {
         colspanClass: "col-span-12",
         label: "Selection",
@@ -105,5 +103,5 @@ export const form = createForm({
         ],
       },
     },
-  } satisfies FieldsDefinition,
+  }),
 });

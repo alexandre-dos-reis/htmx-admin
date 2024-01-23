@@ -20,13 +20,11 @@ import { MaybePromise, PartialExtended } from "~/utils/types";
 import { wrapSchemaWithPreProcess } from "./preProcesses";
 
 export type FieldError = Array<string> | undefined;
-export type AnonFormErrors = Record<string, FieldError> | undefined;
+// export type AnonFormErrors = Record<string, FieldError> | undefined;
 
 type OmitName<TProps extends { name: string }> = Omit<TProps, "name">;
 
-export type Params = { currentRecordId: string };
-
-type LoadSchema<T extends Params> = (ctx: ContextDecorated, params?: T) => z.ZodTypeAny;
+// export type Params = { currentRecordId: string };
 
 type PropsPerType =
   | {
@@ -50,25 +48,29 @@ type PropsPerType =
       props: OmitName<RadioInputProps>;
     };
 
-export type FieldsDefinition<T extends Params = Params> = Record<
+export type FieldsDefinition = Record<
   string,
   PropsPerType & {
-    schema: LoadSchema<T>;
+    schema: z.ZodTypeAny;
   }
 >;
 
-export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }: { fields: TFields }) => {
+export const createForm = <TFields extends FieldsDefinition>({
+  loadFields,
+}: {
+  loadFields: (ctx: ContextDecorated, formArgs?: { editModelId: string | number | undefined }) => TFields;
+}) => {
   type Schema = z.ZodObject<
     {
-      [Key in keyof TFields]: ReturnType<TFields[Key]["schema"]>;
+      [Key in keyof TFields]: TFields[Key]["schema"];
     },
     "strip",
     z.ZodTypeAny,
     {
-      [Key in keyof TFields]: z.infer<ReturnType<TFields[Key]["schema"]>>;
+      [Key in keyof TFields]: z.infer<TFields[Key]["schema"]>;
     },
     {
-      [Key in keyof TFields]: z.infer<ReturnType<TFields[Key]["schema"]>>;
+      [Key in keyof TFields]: z.infer<TFields[Key]["schema"]>;
     }
   >;
 
@@ -76,34 +78,46 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
 
   type Errors = Partial<Record<keyof Data, FieldError>>;
 
-  const getSchemaFromDefinition = (args?: { params?: Params }) => {
-    return Object.keys(fields).reduce((formSchema, keyOfField) => {
-      const { type, schema: loadSchema } = fields[keyOfField];
+  const getSchemaFromDefinition = (args: { fields: TFields }) => {
+    return Object.keys(args.fields).reduce((formSchema, keyOfField) => {
+      const { type, schema } = args.fields[keyOfField];
       return formSchema.extend({
-        [keyOfField]: wrapSchemaWithPreProcess({ type, schema: loadSchema(getContext()!, args?.params) }),
+        [keyOfField]: wrapSchemaWithPreProcess({ type, schema }),
       });
     }, z.object({})) as Schema;
   };
 
-  const handleForm = async (
-    params?: Params,
-  ): Promise<{
-    data?: Data;
-    errors?: Errors;
-  }> => {
-    const context = getContext();
+  const handleForm = async (args?: {
+    editModelId: string | number | undefined;
+  }): Promise<
+    | {
+        data: undefined;
+        errors: undefined;
+      }
+    | {
+        data: Data;
+        errors: undefined;
+      }
+    | {
+        data: undefined;
+        errors: Errors;
+      }
+  > => {
+    const ctx = getContext();
 
-    if (!context?.isMethodPost) {
+    if (!ctx?.isMethodPost) {
       return { data: undefined, errors: undefined };
     }
 
-    const schema = getSchemaFromDefinition({ params });
+    const fields = loadFields(ctx, { editModelId: args?.editModelId });
+
+    const schema = getSchemaFromDefinition({ fields });
 
     let parsedSchema: Awaited<ReturnType<(typeof schema)["spa"]>>;
 
-    if (context.isFormValidationRequest) {
-      const name = context.inputNameRequest;
-      const body = context.body as Record<string, unknown>;
+    if (ctx.isFormValidationRequest) {
+      const name = ctx.inputNameRequest;
+      const body = ctx.body as Record<string, unknown>;
 
       if (name && name in body && name in fields) {
         parsedSchema = await schema.shape[name].spa(body[name]);
@@ -111,7 +125,7 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
         return { data: undefined, errors: undefined };
       }
     } else {
-      parsedSchema = await schema.spa(context?.body);
+      parsedSchema = await schema.spa(ctx?.body);
     }
 
     if (parsedSchema.success) {
@@ -119,8 +133,8 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
     } else {
       return {
         data: undefined,
-        errors: (context.isFormValidationRequest
-          ? { [context.inputNameRequest]: parsedSchema.error.flatten().formErrors }
+        errors: (ctx.isFormValidationRequest
+          ? { [ctx.inputNameRequest]: parsedSchema.error.flatten().formErrors }
           : parsedSchema.error.flatten().fieldErrors) as Errors,
       };
     }
@@ -148,9 +162,10 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
     disableHxValidation?: boolean;
   }) => {
     const ctx = getContext();
+    const fields = loadFields(ctx!);
 
     if (!disableHxValidation && ctx?.isFormValidationRequest) {
-      return renderInputFromHxRequest({ errors });
+      return renderInputFromHxRequest({ errors, fields });
     }
 
     const defaultValues = await loadDefaultValues?.(ctx!);
@@ -177,23 +192,19 @@ export const createForm = <TFields extends FieldsDefinition<Params>>({ fields }:
     );
   };
 
-  const renderFormInput = ({ name, error }: { name: keyof TFields; error: FieldError }) => {
-    const { type, props } = fields[name];
-    return getComponent({
-      name: name as string,
-      propsPerType: {
-        props: { ...props, errors: error } as any,
-        type: type as any,
-      },
-    });
-  };
-
-  const renderInputFromHxRequest = (opts?: { errors?: Errors }) => {
+  const renderInputFromHxRequest = (args: { errors?: Errors; fields: TFields }) => {
     const context = getContext();
     const name = context?.inputNameRequest;
 
-    if (name && name in fields) {
-      return renderFormInput({ name, error: opts?.errors?.[name] });
+    if (name && name in args?.fields) {
+      const { props, type } = args?.fields[name];
+      return getComponent({
+        name,
+        propsPerType: {
+          props: { ...props, errors: args.errors?.[name] },
+          type: type,
+        } as any,
+      });
     }
 
     return <></>;

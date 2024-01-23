@@ -1,5 +1,5 @@
 import { ZodTypeAny, z } from "zod";
-import { FieldsDefinition, Params } from "./createForm";
+import { LoadFieldsDefinition } from "./createForm";
 
 const arrayPreProcess = (schema: z.ZodTypeAny) => {
   return z.preprocess((v) => {
@@ -13,7 +13,7 @@ export const wrapSchemaWithPreProcess = ({
   type,
 }: {
   schema: ZodTypeAny;
-  type: FieldsDefinition<Params>[number]["type"];
+  type: ReturnType<LoadFieldsDefinition>[number]["type"];
 }) => {
   switch (type) {
     case "dropdown":

@@ -11,7 +11,7 @@ export const create: Handler = async ({ isFormSubmitted, db, set }) => {
   if (isFormSubmitted && data) {
     try {
       const c = await db.customer.create({
-        data,
+        data: {},
         select: { id: true },
       });
 
