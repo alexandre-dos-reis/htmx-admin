@@ -7,7 +7,7 @@ import { CustomersTabs } from "../components/CustomersTabs";
 const { handleForm, renderForm } = form;
 
 export const edit: Handler = async ({ set, isFormSubmitted, db, params, isFormSaveAndContinue, path }) => {
-  const { data, errors } = await handleForm({ recordId: params["id"] });
+  const { data } = await handleForm({ recordId: params["id"] });
 
   if (isFormSubmitted && data) {
     try {
@@ -36,7 +36,6 @@ export const edit: Handler = async ({ set, isFormSubmitted, db, params, isFormSa
           </div>
         </div>
         {renderForm({
-          errors,
           loadDefaultValues: async ({ db }) => {
             return await db.customer.findFirst({
               where: {

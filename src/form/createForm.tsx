@@ -20,11 +20,8 @@ import { MaybePromise, PartialExtended } from "~/utils/types";
 import { appendSchemaProcess } from "./processes";
 
 export type FieldError = Array<string> | undefined;
-// export type AnonFormErrors = Record<string, FieldError> | undefined;
 
 type OmitName<TProps extends { name: string }> = Omit<TProps, "name">;
-
-// export type Params = { currentRecordId: string };
 
 type PropsPerType =
   | {
@@ -90,6 +87,7 @@ export const createForm = <TFields extends FieldsDef>({
   type Errors = Partial<Record<keyof Data, FieldError>>;
 
   let recordId: RecordId | undefined;
+  let errors: Errors | undefined;
 
   // METHODS
   const handleForm = async (args?: {
@@ -113,6 +111,7 @@ export const createForm = <TFields extends FieldsDef>({
     recordId = args?.recordId;
 
     if (!ctx?.isMethodPost) {
+      errors = undefined;
       return { data: undefined, errors: undefined };
     }
 
@@ -129,20 +128,25 @@ export const createForm = <TFields extends FieldsDef>({
       if (name && name in body && name in fields) {
         parsedSchema = await schema.shape[name].spa(body[name]);
       } else {
-        return { data: undefined, errors: undefined };
+        errors = undefined;
+        return { data: undefined, errors };
       }
     } else {
       parsedSchema = await schema.spa(ctx?.body);
     }
 
     if (parsedSchema.success) {
-      return { data: parsedSchema.data, errors: undefined };
+      errors = undefined;
+      return { data: parsedSchema.data, errors };
     } else {
+      errors = (
+        ctx?.isFormValidationRequest
+          ? { [ctx?.inputNameRequest]: parsedSchema.error.flatten().formErrors }
+          : parsedSchema.error.flatten().fieldErrors
+      ) as Errors;
       return {
         data: undefined,
-        errors: (ctx?.isFormValidationRequest
-          ? { [ctx?.inputNameRequest]: parsedSchema.error.flatten().formErrors }
-          : parsedSchema.error.flatten().fieldErrors) as Errors,
+        errors,
       };
     }
   };
@@ -160,12 +164,10 @@ export const createForm = <TFields extends FieldsDef>({
   const renderForm = async ({
     formProps,
     loadDefaultValues,
-    errors,
     disableHxValidation,
   }: {
     loadDefaultValues?: (ctx: ContextDecorated) => MaybePromise<PartialExtended<Data> | null>;
     formProps?: Omit<ComponentProps<typeof Form>, "mode">;
-    errors?: Errors;
     disableHxValidation?: boolean;
   }) => {
     const ctx = getContext();
