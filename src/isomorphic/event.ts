@@ -1,4 +1,4 @@
-export const appEventName = "app-event";
+export const appEvent = "app-event";
 
 export type AppEvent =
   | {

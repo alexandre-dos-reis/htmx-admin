@@ -1,5 +1,5 @@
-import { HX_HEADERS_CONSTANTS } from "~/config/constants";
-import { type AppEvent, appEventName } from "../isomorphic/event";
+import { HEADERS_CONSTANTS } from "~/config/constants";
+import { type AppEvent, appEvent } from "../isomorphic/event";
 
 type Set = {
   headers: Record<string, string> & {
@@ -13,7 +13,7 @@ export const redirectTo = (args: { to: string; set: Set }) => {
   args.set.headers["HX-Location"] = JSON.stringify({
     path: args.to,
     headers: {
-      [HX_HEADERS_CONSTANTS.renderNavbar]: true,
+      [HEADERS_CONSTANTS.renderNavbar]: true,
     },
     target: "#main",
     select: "#main",
@@ -22,19 +22,19 @@ export const redirectTo = (args: { to: string; set: Set }) => {
 
 export const sendEvents = ({ set, events }: { set: Set; events: Array<AppEvent> }) => {
   set.headers["Hx-Trigger"] = JSON.stringify({
-    [appEventName]: events,
+    [appEvent]: events,
   });
 };
 
 export const sendEvent = ({ set, event }: { set: Set; event: AppEvent }) => {
   set.headers["Hx-Trigger"] = JSON.stringify({
-    [appEventName]: [event],
+    [appEvent]: [event],
   });
 };
 
 export const notifyAndRedirect = ({ message, to, set }: { to: string; set: Set; message: string }) => {
-  sendEvent({ set, event: { message, name: "notify", level: "success" } });
   redirectTo({ set, to });
+  sendEvent({ set, event: { message, name: "notify", level: "success" } });
 };
 
 export const notifyAnError = ({ message, set }: { set: Set; message?: string }) => {

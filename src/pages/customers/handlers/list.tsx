@@ -1,5 +1,5 @@
 import { Link, Layout } from "~/components/*";
-import { HX_HEADERS_CONSTANTS } from "~/config/constants";
+import { HEADERS_CONSTANTS } from "~/config/constants";
 import { Handler } from "~/config/decorateRequest";
 import { getContext } from "~/config/globalStorages";
 import { listStateMapperToDb } from "~/database/helpers";
@@ -56,7 +56,7 @@ export const list: Handler = async () => {
             name="search"
             hx-trigger="input changed delay:500ms, search"
             hx-target="#list"
-            hx-headers={JSON.stringify({ [HX_HEADERS_CONSTANTS.renderFragment]: true })}
+            hx-headers={JSON.stringify({ [HEADERS_CONSTANTS.renderFragment]: true })}
             hx-get={ctx?.path}
             _="on input call setParam('filterByName', event.target.value)"
           />

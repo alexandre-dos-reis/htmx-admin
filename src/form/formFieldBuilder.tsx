@@ -1,5 +1,5 @@
 import { cn } from "~/utils";
-import { ATTRIBUTES_CONSTANTS, HX_HEADERS_CONSTANTS } from "../config/constants";
+import { ATTRIBUTES_CONSTANTS, HEADERS_CONSTANTS } from "../config/constants";
 import { HxValidation } from "./interfaces";
 import {
   TextInputProps,
@@ -49,7 +49,7 @@ export const formFieldBuilder = <TInputProps extends InputProps>(props: TInputPr
             "hx-swap": "morph:outerHTML",
             "hx-include": `closest form`,
             "hx-headers": JSON.stringify({
-              [HX_HEADERS_CONSTANTS.formValidation]: true,
+              [HEADERS_CONSTANTS.formValidation]: true,
             }),
           }
         : {}),

@@ -1,7 +1,7 @@
 import { getContext } from "~/config/globalStorages";
 import { Link } from "./Link";
 import { cn } from "~/utils";
-import { HX_HEADERS_CONSTANTS } from "~/config/constants";
+import { HEADERS_CONSTANTS } from "~/config/constants";
 
 export const Tabs = (p: JSX.ElementChildrenAttribute & { tabs: Array<{ href: string; label: string }> }) => {
   const ctx = getContext();
@@ -17,7 +17,7 @@ export const Tabs = (p: JSX.ElementChildrenAttribute & { tabs: Array<{ href: str
                 href={t.href}
                 role="tab"
                 class={cn("tab", isActive && "tab-active cursor-default")}
-                hxHeaders={{ [HX_HEADERS_CONSTANTS.renderFragment]: "true" }}
+                hxHeaders={{ [HEADERS_CONSTANTS.renderFragment]: "true" }}
                 hx-swap="outerHTML"
                 hx-target="#tab-fragment"
                 hx-select="#tab-fragment"

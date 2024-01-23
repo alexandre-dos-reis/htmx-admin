@@ -6,21 +6,20 @@ import { CustomersTabs } from "../components/CustomersTabs";
 
 const { handleForm, renderForm } = form;
 
-export const edit: Handler = async ({ set, isFormSubmitted, db, params }) => {
-  const { data, errors } = await handleForm({ editModelId: params["id"] });
+export const edit: Handler = async ({ set, isFormSubmitted, db, params, isFormSaveAndContinue, path }) => {
+  const { data, errors } = await handleForm({ recordId: params["id"] });
 
   if (isFormSubmitted && data) {
-    const { selection, ...otherData } = data;
     try {
       await db.customer.update({
-        data: otherData,
+        data,
         where: { id: params["id"] },
         select: { id: true },
       });
 
       return notifyAndRedirect({
         set,
-        to: "/customers",
+        to: isFormSaveAndContinue ? path : "/customers",
         message: "Changes saved successfully !",
       });
     } catch (e) {

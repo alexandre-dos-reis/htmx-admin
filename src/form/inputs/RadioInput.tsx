@@ -1,11 +1,9 @@
 import { cn } from "~/utils";
 import { formFieldBuilder, BaseInputComponent } from "~/form/*";
-import { ContextDecorated } from "~/config/decorateRequest";
-import { getContext } from "~/config/globalStorages";
 
 export interface RadioInputProps extends Omit<JSX.HtmlInputTag, "name">, BaseInputComponent {
   label?: string;
-  choices: (ctx?: ContextDecorated) => Array<{ value: string; children: JSX.Element }>;
+  choices: Array<{ value: string; children: JSX.Element; labelError?: string }>;
 }
 
 const colors = [
@@ -26,11 +24,10 @@ export const RadioInput = (props: RadioInputProps) => {
     Label,
   } = formFieldBuilder(props);
 
-  const ctx = getContext();
   return (
     <label {...wrapperProps}>
       {Label}
-      {choices(ctx).map((choice, i) => {
+      {choices.map((choice, i) => {
         const isSelected = choice.value === value;
         return (
           <label class="label cursor-pointer flex justify-start gap-6">

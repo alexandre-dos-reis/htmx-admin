@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ComponentProps } from "~/utils";
+import { ComponentProps, isObjectEmpty } from "~/utils";
 import {
   SelectInput,
   SelectInputProps,
@@ -17,7 +17,7 @@ import { match } from "ts-pattern";
 import { getContext } from "~/config/globalStorages";
 import { ContextDecorated } from "~/config/decorateRequest";
 import { MaybePromise, PartialExtended } from "~/utils/types";
-import { wrapSchemaWithPreProcess } from "./preProcesses";
+import { appendSchemaProcess } from "./processes";
 
 export type FieldError = Array<string> | undefined;
 // export type AnonFormErrors = Record<string, FieldError> | undefined;
@@ -48,18 +48,29 @@ type PropsPerType =
       props: OmitName<RadioInputProps>;
     };
 
-export type FieldsDefinition = Record<
-  string,
-  PropsPerType & {
-    schema: z.ZodTypeAny;
-  }
->;
+export type FieldDef = PropsPerType & {
+  schema: z.ZodTypeAny;
+};
 
-export const createForm = <TFields extends FieldsDefinition>({
+export type FieldsDef = Record<string, FieldDef>;
+
+export type RecordId = string | number | undefined;
+
+const getSchemaFromDefinition = (args: { fields: FieldsDef }) => {
+  return Object.keys(args.fields).reduce((formSchema, keyOfField) => {
+    return formSchema.extend({
+      [keyOfField]: appendSchemaProcess({ field: args.fields[keyOfField] }),
+    });
+  }, z.object({}));
+};
+
+// Main Func
+export const createForm = <TFields extends FieldsDef>({
   loadFields,
 }: {
-  loadFields: (ctx: ContextDecorated, formArgs?: { editModelId: string | number | undefined }) => TFields;
+  loadFields: (ctx: ContextDecorated, formArgs?: { recordId: RecordId }) => TFields;
 }) => {
+  // TYPE DEFINITIONS
   type Schema = z.ZodObject<
     {
       [Key in keyof TFields]: TFields[Key]["schema"];
@@ -78,17 +89,11 @@ export const createForm = <TFields extends FieldsDefinition>({
 
   type Errors = Partial<Record<keyof Data, FieldError>>;
 
-  const getSchemaFromDefinition = (args: { fields: TFields }) => {
-    return Object.keys(args.fields).reduce((formSchema, keyOfField) => {
-      const { type, schema } = args.fields[keyOfField];
-      return formSchema.extend({
-        [keyOfField]: wrapSchemaWithPreProcess({ type, schema }),
-      });
-    }, z.object({})) as Schema;
-  };
+  let recordId: RecordId | undefined;
 
+  // METHODS
   const handleForm = async (args?: {
-    editModelId: string | number | undefined;
+    recordId: RecordId;
   }): Promise<
     | {
         data: undefined;
@@ -105,19 +110,21 @@ export const createForm = <TFields extends FieldsDefinition>({
   > => {
     const ctx = getContext();
 
+    recordId = args?.recordId;
+
     if (!ctx?.isMethodPost) {
       return { data: undefined, errors: undefined };
     }
 
-    const fields = loadFields(ctx, { editModelId: args?.editModelId });
+    const fields = loadFields(ctx!, { recordId: args?.recordId });
 
-    const schema = getSchemaFromDefinition({ fields });
+    const schema = getSchemaFromDefinition({ fields }) as Schema;
 
     let parsedSchema: Awaited<ReturnType<(typeof schema)["spa"]>>;
 
-    if (ctx.isFormValidationRequest) {
-      const name = ctx.inputNameRequest;
-      const body = ctx.body as Record<string, unknown>;
+    if (ctx?.isFormValidationRequest) {
+      const name = ctx?.inputNameRequest;
+      const body = ctx?.body as Record<string, unknown>;
 
       if (name && name in body && name in fields) {
         parsedSchema = await schema.shape[name].spa(body[name]);
@@ -133,8 +140,8 @@ export const createForm = <TFields extends FieldsDefinition>({
     } else {
       return {
         data: undefined,
-        errors: (ctx.isFormValidationRequest
-          ? { [ctx.inputNameRequest]: parsedSchema.error.flatten().formErrors }
+        errors: (ctx?.isFormValidationRequest
+          ? { [ctx?.inputNameRequest]: parsedSchema.error.flatten().formErrors }
           : parsedSchema.error.flatten().fieldErrors) as Errors,
       };
     }
@@ -157,12 +164,13 @@ export const createForm = <TFields extends FieldsDefinition>({
     disableHxValidation,
   }: {
     loadDefaultValues?: (ctx: ContextDecorated) => MaybePromise<PartialExtended<Data> | null>;
-    formProps?: ComponentProps<typeof Form>;
+    formProps?: Omit<ComponentProps<typeof Form>, "mode">;
     errors?: Errors;
     disableHxValidation?: boolean;
   }) => {
     const ctx = getContext();
-    const fields = loadFields(ctx!);
+
+    const fields = loadFields(ctx!, { recordId });
 
     if (!disableHxValidation && ctx?.isFormValidationRequest) {
       return renderInputFromHxRequest({ errors, fields });
@@ -171,7 +179,7 @@ export const createForm = <TFields extends FieldsDefinition>({
     const defaultValues = await loadDefaultValues?.(ctx!);
 
     return (
-      <Form {...formProps}>
+      <Form {...formProps} mode={recordId ? "edit" : "create"}>
         {Object.keys(fields).map(async (name) => {
           const { type, props } = fields[name];
           return getComponent({
@@ -180,9 +188,7 @@ export const createForm = <TFields extends FieldsDefinition>({
               type: type as any,
               props: {
                 ...props,
-                value: (ctx?.isMethodGet && defaultValues ? defaultValues?.[name] : undefined) as  // Remove null
-                  | NonNullable<(typeof defaultValues)[keyof typeof defaultValues]>
-                  | undefined,
+                value: defaultValues?.[name] as NonNullable<(typeof defaultValues)[keyof typeof defaultValues]>,
                 errors: errors?.[name],
               },
             },

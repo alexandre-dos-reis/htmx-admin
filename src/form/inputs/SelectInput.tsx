@@ -1,10 +1,8 @@
 import { cn } from "~/utils";
 import { formFieldBuilder, BaseInputComponent } from "~/form/*";
-import { ContextDecorated } from "~/config/decorateRequest";
-import { getContext } from "~/config/globalStorages";
 
 export interface SelectInputProps extends Omit<JSX.HtmlSelectTag, "name" | "multiple">, BaseInputComponent {
-  options: (ctx?: ContextDecorated) => Array<{ value: string; label: string }>;
+  options: Array<{ value: string; label: string }>;
   value?: string;
   defaultOptionLabel?: string;
 }
@@ -18,7 +16,6 @@ export const SelectInput = (props: SelectInputProps) => {
   } = formFieldBuilder(props);
 
   const errorClass = "select-error";
-  const ctx = getContext();
 
   return (
     <label {...wrapperProps}>
@@ -31,7 +28,7 @@ export const SelectInput = (props: SelectInputProps) => {
         <option disabled selected={value ? undefined : "selected"} value="">
           {defaultOptionLabel ?? "-Select a choice-"}
         </option>
-        {options(ctx).map((o) => (
+        {options.map((o) => (
           <option value={o.value} selected={value === o.value ? "selected" : undefined}>
             {o.label}
           </option>

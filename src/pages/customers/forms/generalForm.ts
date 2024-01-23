@@ -1,107 +1,113 @@
-import { createForm, FieldsDefinition } from "~/form/createForm";
+import { createForm, FieldsDef } from "~/form/createForm";
 import { zArray, zChoice, zEmail, zStringRequired } from "~/form/schemas";
 
 // https://github.com/alexandre-dos-reis/htmx-form-validation/blob/vite/src/pages/customers/form.ts
 export const form = createForm({
-  loadFields: ({ db }, args) => ({
-    email: {
-      schema: zEmail.refine(
-        async (email) =>
-          !(await db.customer.count({
-            where: args?.editModelId
-              ? {
-                  AND: {
-                    email,
-                    NOT: { id: `${args.editModelId}` },
-                  },
-                }
-              : { email },
-          })),
-        {
-          message: "Email is already taken",
-        },
-      ),
-      props: {
-        autocomplete: "email",
-        label: "Email",
-        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
-        hxValidation: {
-          triggerOn: "blur",
-        },
-      },
-    },
-    name: {
-      schema: zStringRequired,
-      props: {
-        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
-        autocomplete: "name",
-        label: "Name",
-        hxValidation: {
-          triggerOn: "blur",
-        },
-      },
-    },
-    location: {
-      schema: zStringRequired,
-      props: {
-        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
-        autocomplete: "name",
-        label: "Location",
-        hxValidation: {
-          triggerOn: "blur",
+  loadFields: ({ db }, args) => {
+    const jobOptions = [
+      { label: "Dev", value: "dev" },
+      { label: "LeadDev", value: "lead-dev" },
+      { label: "Devops", value: "devops" },
+    ];
+
+    const selectionChoices = [
+      { value: "some", children: "some" },
+      { value: "test", children: "test" },
+    ];
+
+    return {
+      email: {
+        schema: zEmail.refine(
+          async (email) =>
+            !(await db.customer.count({
+              where: args?.recordId
+                ? {
+                    AND: {
+                      email,
+                      NOT: { id: `${args.recordId}` },
+                    },
+                  }
+                : { email },
+            })),
+          {
+            message: "Email is already taken",
+          },
+        ),
+        props: {
+          autocomplete: "email",
+          label: "Email",
+          colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
+          hxValidation: {
+            triggerOn: "blur",
+          },
         },
       },
-    },
-    company: {
-      type: "select",
-      schema: zChoice,
-      props: {
-        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
-        label: "Company",
-        options: () => [
-          { label: "Google", value: "google" },
-          { label: "Facebook", value: "fb" },
-          { label: "Amazon", value: "amazon" },
-        ],
+      name: {
+        schema: zStringRequired,
+        props: {
+          colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
+          autocomplete: "name",
+          label: "Name",
+          hxValidation: {
+            triggerOn: "blur",
+          },
+        },
       },
-    },
-    job: {
-      type: "select",
-      schema: zChoice,
-      props: {
-        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
-        label: "Job",
-        options: () => [
-          { label: "Dev", value: "dev" },
-          { label: "LeadDev", value: "lead-dev" },
-          { label: "Devops", value: "devops" },
-        ],
+      location: {
+        schema: zStringRequired,
+        props: {
+          colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
+          autocomplete: "name",
+          label: "Location",
+          hxValidation: {
+            triggerOn: "blur",
+          },
+        },
       },
-    },
-    color: {
-      type: "select",
-      schema: zChoice,
-      props: {
-        colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
-        label: "Color",
-        options: () => [
-          { label: "Red", value: "red" },
-          { label: "Blue", value: "blue" },
-          { label: "Black", value: "black" },
-        ],
+      company: {
+        type: "select",
+        schema: zChoice,
+        props: {
+          colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
+          label: "Company",
+          options: [
+            { label: "Google", value: "google" },
+            { label: "Facebook", value: "fb" },
+            { label: "Amazon", value: "amazon" },
+          ],
+        },
       },
-    },
-    selection: {
-      type: "dropdown",
-      schema: zArray,
-      props: {
-        colspanClass: "col-span-12",
-        label: "Selection",
-        choices: () => [
-          { value: "some", children: "some" },
-          { value: "test", children: "test" },
-        ],
+      job: {
+        type: "select",
+        schema: zChoice,
+        props: {
+          colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
+          label: "Job",
+          options: jobOptions,
+        },
       },
-    },
-  }),
+      color: {
+        type: "select",
+        schema: zChoice,
+        props: {
+          colspanClass: "col-span-12 lg:col-span-6 xl:col-span-6",
+          label: "Color",
+          options: [
+            { label: "Red", value: "red" },
+            { label: "Blue", value: "blue" },
+            { label: "Black", value: "black" },
+          ],
+        },
+      },
+      // selection: {
+      //   type: "dropdown",
+      //   schema: zArray,
+      //   props: {
+      //     colspanClass: "col-span-12",
+      //     label: "Selection",
+      //     choices: selectionChoices,
+      //   },
+      // },
+    };
+  },
 });

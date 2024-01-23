@@ -1,7 +1,7 @@
 import { cn } from "~/utils";
 import { ThemeController } from "./ThemeController";
 import { Link } from "./Link";
-import { HX_HEADERS_CONSTANTS } from "~/config/constants";
+import { HEADERS_CONSTANTS } from "~/config/constants";
 import { OmniSearch } from "~/fragments/omniSearch";
 
 export const Header = () => {
@@ -12,7 +12,7 @@ export const Header = () => {
           class="btn btn-ghost text-xl"
           href="/"
           hx-target="#main"
-          hxHeaders={{ [HX_HEADERS_CONSTANTS.renderNavbar]: "true" }}
+          hxHeaders={{ [HEADERS_CONSTANTS.renderNavbar]: "true" }}
         >
           <span class="italic text-primary">htmx</span> Admin
         </Link>

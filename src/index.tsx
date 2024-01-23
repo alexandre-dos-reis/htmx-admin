@@ -8,6 +8,7 @@ import { ENV_VARS } from "./utils/envvars";
 import { customers } from "./pages/customers";
 import { fragments } from "./fragments";
 import { notifyAnError } from "./responses";
+import { api } from "./api";
 
 export const app = new Elysia()
   .use(html())
@@ -15,10 +16,10 @@ export const app = new Elysia()
   .use(decorateRequest)
   .use(globals)
   .onError(({ set, code, error }) => {
-    // console.log({ code, error });
     notifyAnError({ set, message: error.message });
   })
   // Routes
+  .use(api)
   .use(fragments)
   .use(customers)
   .all("/", () => <Layout>Home</Layout>)
