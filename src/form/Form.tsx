@@ -33,7 +33,7 @@ export const Form = ({
       hx-swap="outerHTML"
       hx-replace-url="true"
       hx-headers={hxHeaders ? JSON.stringify(hxHeaders) : undefined}
-      class={cn("grid grid-cols-12 lg:gap-x-20 gap-y-3 mb-20")}
+      class={cn("grid grid-cols-12 lg:gap-x-20 gap-y-3")}
       {...otherProps}
     >
       {children}
