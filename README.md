@@ -2,5 +2,6 @@
 
 ## Todos
 
-- Add [Popup](https://sweetalert2.github.io) when user tries to leave a dirty form.
--
+- Add [Popup/Confirm](https://sweetalert2.github.io) when user :
+  - leave a dirty form.
+  - delete a resource.
