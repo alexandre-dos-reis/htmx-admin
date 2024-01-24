@@ -2,7 +2,8 @@
 import "vite/modulepreload-polyfill";
 
 import "./functions";
-import "./events";
 
 import "./htmx";
 import "./hyperscript";
+
+import "./events";
