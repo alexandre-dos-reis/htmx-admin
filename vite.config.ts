@@ -8,7 +8,7 @@ export default defineConfig({
   },
   build: {
     // generate .vite/manifest.json in outDir
-    manifest: false,
+    manifest: true,
     rollupOptions: {
       // overwrite default .html entry
       input: "./src/client/index.ts",
