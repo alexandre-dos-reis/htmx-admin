@@ -2,21 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  @keyframes pulse-inverse {
-    0% {
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
-
-  .animate-fade-in {
-    animation: pulse-inverse 500ms;
-  }
-}
-
 /*!
  * Toastify js 1.12.0
  * https://github.com/apvarun/toastify-js
