@@ -16,7 +16,7 @@ declare global {
 
 const loadSkeletonFrame = (target: HTMLElement) => {
   target.innerHTML = `
-  <div class="flex flex-col gap-4 justify-center items-center w-full h-full">
+  <div class="flex flex-col gap-4 justify-center items-center w-full h-full transition-opacity delay-300 ease-in duration-500">
     <div class="skeleton bg-opacity-100 h-4 w-full"></div>
     <div class="skeleton bg-opacity-90 h-4 w-full"></div>
     <div class="skeleton bg-opacity-80 h-4 w-full"></div>
@@ -47,18 +47,24 @@ window.onload = () => {
   });
 
   document.body.addEventListener("htmx:beforeRequest", (e) => {
-    const target = (e?.detail.target.id ? e.detail.target : document.getElementById("main")) as HTMLElement;
-    const currentPath = window.location.pathname;
-    const pathRequested = e.detail.requestConfig.path.split("?")[0];
     const isPreloadLink = !!e.detail.elt.attributes.getNamedItem("preload");
 
-    if (!isPreloadLink && pathRequested !== currentPath) {
+    if (isPreloadLink) {
+      return;
+    }
+
+    const currentPath = window.location.pathname;
+    const pathRequested = e.detail.requestConfig.path.split("?")[0];
+
+    if (pathRequested !== currentPath) {
+      const target = (e?.detail.target.id ? e.detail.target : document.getElementById("main")) as HTMLElement;
       loadSkeletonFrame(target);
     }
   });
 
   document.getElementById("navbar")?.addEventListener("click", (e) => {
     const target = e.target as HTMLElement;
+
     if (target.tagName === "A") {
       loadSkeletonFrame(document.getElementById("main") as HTMLElement);
     }
