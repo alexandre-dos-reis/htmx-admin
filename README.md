@@ -14,3 +14,5 @@
 
 - Try to simplify hx-swap to innerHTML to avoid errors with speed clicks.
 - Remove useless wrapper html tags returned by server.
+
+- Push to production to test.

@@ -1,6 +1,5 @@
 import { match } from "ts-pattern";
 import { appEvent, type AppEvent } from "../../isomorphic/event";
-import {} from "htmx.org";
 
 declare global {
   interface Event {
@@ -14,7 +13,7 @@ declare global {
   }
 }
 
-const loadSkeletonFrame = (target: HTMLElement) => {
+const appendSkeletonFrame = (target: HTMLElement) => {
   target.innerHTML = `
     <div class="flex flex-col gap-4 justify-center items-center w-full h-full animate-fade-in">
       <div class="skeleton bg-opacity-100 h-4 w-full"></div>
@@ -58,15 +57,13 @@ window.onload = () => {
 
     if (pathRequested !== currentPath) {
       const target = (e?.detail.target.id ? e.detail.target : document.getElementById("main")) as HTMLElement;
-      loadSkeletonFrame(target);
+      appendSkeletonFrame(target);
     }
   });
 
   document.getElementById("navbar")?.addEventListener("click", (e) => {
-    const target = e.target as HTMLElement;
-
-    if (target.tagName === "A") {
-      loadSkeletonFrame(document.getElementById("main") as HTMLElement);
+    if ((e.target as HTMLElement).tagName === "A") {
+      appendSkeletonFrame(document.getElementById("main") as HTMLElement);
     }
   });
 };
