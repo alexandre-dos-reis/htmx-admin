@@ -2,26 +2,27 @@ import { Context, Elysia } from "elysia";
 import { ATTRIBUTES_CONSTANTS, HEADERS_CONSTANTS } from "./constants";
 import { prisma } from "~/database/client";
 import { MaybePromise } from "~/utils/types";
+import { AppEvent, appEvent } from "~/isomorphic/event";
 
-const decorate = ({ request }: Context) => {
+const decorateBase = ({ request: { headers, method }, set, path }: Context) => {
   // HTTP
-  const isMethodPost = request.method === "POST";
-  const isMethodGet = request.method === "GET";
-  const contentType = request.headers.get("Content-Type");
+  const isMethodPost = method === "POST";
+  const isMethodGet = method === "GET";
+  const contentType = headers.get("Content-Type");
 
   // HTMX
-  const hxTargetId = request.headers.get("Hx-Target");
-  const hxTriggerName = request.headers.get("Hx-Trigger-Name");
-  const hxTriggerId = request.headers.get("Hx-Trigger");
+  const hxTargetId = headers.get("Hx-Target");
+  const hxTriggerName = headers.get("Hx-Trigger-Name");
+  const hxTriggerId = headers.get("Hx-Trigger");
 
   // APP
-  const isFormValidationRequest = isMethodPost && request.headers.has(HEADERS_CONSTANTS["formValidation"]);
+  const isFormValidationRequest = isMethodPost && headers.has(HEADERS_CONSTANTS["formValidation"]);
   const isFormSubmitted =
     !isFormValidationRequest &&
     isMethodPost &&
     (contentType === "multipart/form-data" || contentType === "application/x-www-form-urlencoded");
 
-  const isFormSaveAndContinue = isFormSubmitted && request.headers.has(HEADERS_CONSTANTS["formSaveAndContinue"]);
+  const isFormSaveAndContinue = isFormSubmitted && headers.has(HEADERS_CONSTANTS["formSaveAndContinue"]);
   const inputNameRequest = hxTriggerName || hxTargetId?.replace(ATTRIBUTES_CONSTANTS.form["inputWrapperId"], "") || "";
 
   return {
@@ -30,26 +31,71 @@ const decorate = ({ request }: Context) => {
     isMethodGet,
 
     // HTMX
-    isHxRequest: request.headers.has("Hx-Request"),
-    isHxBoost: request.headers.has("Hx-Boost"),
+    isHxRequest: headers.has("Hx-Request"),
+    isHxBoost: headers.has("Hx-Boost"),
     hxTargetId,
     hxTriggerName,
     hxTriggerId,
 
     // APP
-    renderFragment: request.headers.has(HEADERS_CONSTANTS.renderFragment),
-    renderNavbar: request.headers.has(HEADERS_CONSTANTS.renderNavbar),
+    renderFragment: headers.has(HEADERS_CONSTANTS.renderFragment),
+    renderNavbar: headers.has(HEADERS_CONSTANTS.renderNavbar),
     isFormValidationRequest,
     isFormSaveAndContinue,
     inputNameRequest,
     isFormSubmitted,
     db: prisma,
+
+    // RESPONSES
+    redirectTo: (to: string) => {
+      set.headers["HX-Location"] = JSON.stringify({
+        path: isFormSaveAndContinue ? path : to,
+        headers: {
+          [HEADERS_CONSTANTS.renderNavbar]: true,
+        },
+        target: "#main",
+        select: "#main",
+      });
+    },
+
+    sendEvents: (events: Array<AppEvent>) => {
+      set.headers["Hx-Trigger"] = JSON.stringify({
+        [appEvent]: events,
+      });
+    },
+
+    sendEvent: (event: AppEvent) => {
+      set.headers["Hx-Trigger"] = JSON.stringify({
+        [appEvent]: [event],
+      });
+    },
   };
 };
 
-export const decorateRequest = new Elysia({ name: "context-decorated" }).derive((ctx) => decorate(ctx));
+const decorateExtended = ({ sendEvent, redirectTo }: Context & ReturnType<typeof decorateBase>) => {
+  return {
+    notifyAndRedirect: ({ message, to }: { to: string; message: string }) => {
+      redirectTo(to);
+      sendEvent({ message, name: "notify", level: "success" });
+    },
+    notifyAnError: (message?: string) => {
+      sendEvent({
+        message: message ?? "A problem occured, please try again later !",
+        name: "notify",
+        level: "error",
+      });
+    },
+    notify: ({ message, level }: { message: string; level: Extract<AppEvent, { name: "notify" }>["level"] }) => {
+      sendEvent({ message, name: "notify", level });
+    },
+  };
+};
 
-export type ContextDecorated = ReturnType<typeof decorate> & Context;
+export const decorateRequest = new Elysia({ name: "context-decorated" })
+  .derive((ctx) => decorateBase(ctx))
+  .derive((ctx) => decorateExtended(ctx));
+
+export type ContextDecorated = ReturnType<typeof decorateBase> & ReturnType<typeof decorateExtended> & Context;
 
 export type Handler = (
   ctx: Omit<ContextDecorated, "params"> & { params: Record<string, string> },

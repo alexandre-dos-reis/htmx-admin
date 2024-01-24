@@ -1,12 +1,11 @@
 import { Handler } from "~/config/decorateRequest";
 import { form } from "../forms/generalForm";
-import { notifyAndRedirect } from "~/responses";
 import { Layout } from "~/components/*";
 import { CustomersTabs } from "../components/CustomersTabs";
 
 const { handleForm, renderForm } = form;
 
-export const edit: Handler = async ({ set, isFormSubmitted, db, params, isFormSaveAndContinue, path }) => {
+export const edit: Handler = async ({ notifyAndRedirect, isFormSubmitted, db, params }) => {
   const { data } = await handleForm({ recordId: params["id"] });
 
   if (isFormSubmitted && data) {
@@ -18,8 +17,7 @@ export const edit: Handler = async ({ set, isFormSubmitted, db, params, isFormSa
       });
 
       return notifyAndRedirect({
-        set,
-        to: isFormSaveAndContinue ? path : "/customers",
+        to: "/customers",
         message: "Changes saved successfully !",
       });
     } catch (e) {

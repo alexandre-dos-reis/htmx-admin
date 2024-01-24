@@ -42,6 +42,9 @@ export const Form = ({
           {cancelBtnLabel ?? "Cancel"}
         </Link>
         <div class="w-full flex justify-center gap-x-8">
+          <button type="submit" class={cn("btn btn-outline btn-success mb-10")}>
+            {submitBtnlabel ?? mode === "edit" ? "Save" : "Create"}
+          </button>
           {mode === "edit" ? (
             <button
               type="button"
@@ -57,9 +60,6 @@ export const Form = ({
               {submitAndContinueBtnlabel ?? "Save and continue"}
             </button>
           ) : null}
-          <button type="submit" class={cn("btn btn-outline btn-success mb-10")}>
-            {submitBtnlabel ?? mode === "edit" ? "Save" : "Create"}
-          </button>
         </div>
         {mode === "edit" ? (
           <button

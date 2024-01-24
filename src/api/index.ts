@@ -2,7 +2,6 @@ import Elysia from "elysia";
 import { decorateRequest } from "~/config/decorateRequest";
 import { PrismaModelName } from "~/database/client";
 import { z } from "zod";
-import { notifyAndRedirect } from "~/responses";
 import { upperFirst } from "~/utils/func";
 
 const resourceToPrismaModelName = (modelName: string) => {
@@ -19,7 +18,7 @@ const resourceToPrismaModelName = (modelName: string) => {
 
 export const api = new Elysia({ name: "api", prefix: "/api" })
   .use(decorateRequest)
-  .delete("/ressources/*", async ({ params, db, set }) => {
+  .delete("/ressources/*", async ({ params, db, notifyAndRedirect }) => {
     try {
       const [resource, id] = params["*"].split("/");
 
@@ -34,7 +33,6 @@ export const api = new Elysia({ name: "api", prefix: "/api" })
       });
 
       return notifyAndRedirect({
-        set,
         to: `/${resource}`,
         message: `${upperFirst(prismaModelName)} deleted successfully !`,
       });

@@ -7,19 +7,17 @@ import { html } from "@elysiajs/html";
 import { ENV_VARS } from "./utils/envvars";
 import { customers } from "./pages/customers";
 import { fragments } from "./fragments";
-import { notifyAnError } from "./responses";
 import { api } from "./api";
 
 export const app = new Elysia()
-  .use(html())
-  .use(staticPlugin({ assets: "public", prefix: "public" }))
   .use(decorateRequest)
   .use(globals)
-  .onError(({ set, code, error }) => {
-    notifyAnError({ set, message: error.message });
+  .onError(({ code, error, notifyAnError }) => {
+    notifyAnError(error.message);
   })
-  // Routes
+  .use(staticPlugin({ assets: "public", prefix: "public" }))
   .use(api)
+  .use(html())
   .use(fragments)
   .use(customers)
   .all("/", () => <Layout>Home</Layout>)

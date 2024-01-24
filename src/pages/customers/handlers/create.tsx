@@ -1,11 +1,10 @@
 import { Layout } from "~/components/*";
 import { Handler } from "~/config/decorateRequest";
-import { notifyAndRedirect } from "~/responses";
 import { form } from "../forms/generalForm";
 
 const { handleForm, renderForm } = form;
 
-export const create: Handler = async ({ isFormSubmitted, db, set }) => {
+export const create: Handler = async ({ isFormSubmitted, db, notifyAndRedirect }) => {
   const { data, errors } = await handleForm();
 
   if (isFormSubmitted && data) {
@@ -16,7 +15,6 @@ export const create: Handler = async ({ isFormSubmitted, db, set }) => {
       });
 
       return notifyAndRedirect({
-        set,
         to: `/customers/${c.id}`,
         message: "Creation saved successfully !",
       });
@@ -26,11 +24,5 @@ export const create: Handler = async ({ isFormSubmitted, db, set }) => {
     return;
   }
 
-  return (
-    <Layout>
-      {renderForm({
-        errors,
-      })}
-    </Layout>
-  );
+  return <Layout>{renderForm({})}</Layout>;
 };
