@@ -16,24 +16,24 @@ declare global {
 
 const loadSkeletonFrame = (target: HTMLElement) => {
   target.innerHTML = `
-  <div class="flex flex-col gap-4 justify-center items-center w-full h-full transition-opacity delay-300 ease-in duration-500">
-    <div class="skeleton bg-opacity-100 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-90 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-80 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-75 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-70 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-60 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-55 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-50 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-45 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-35 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-30 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-20 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-25 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-10 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-15 h-4 w-full"></div>
-    <div class="skeleton bg-opacity-0 h-4 w-full"></div>
-  </div>
+    <div class="flex flex-col gap-4 justify-center items-center w-full h-full animate-fade-in">
+      <div class="skeleton bg-opacity-100 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-90 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-80 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-75 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-70 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-60 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-55 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-50 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-45 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-35 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-30 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-20 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-25 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-10 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-15 h-4 w-full"></div>
+      <div class="skeleton bg-opacity-0 h-4 w-full"></div>
+    </div>
   `;
 };
 
