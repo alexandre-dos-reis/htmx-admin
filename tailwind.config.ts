@@ -19,6 +19,11 @@ export const themes = [
 
 export default {
   content: ["./src/**/*.{tsx,ts}"],
+  safelist: [
+    {
+      pattern: /bg-opacity-*/,
+    },
+  ],
   theme: {
     extend: {},
   },

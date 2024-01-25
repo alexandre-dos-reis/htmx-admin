@@ -11,6 +11,7 @@ type HxSwap =
 
 declare namespace JSX {
   interface HtmlTag {
+    is?: string; // custom elements
     _?: string;
     "hx-swap"?: HxSwap;
     preload?: (string & {}) | boolean | "mouseover";

@@ -13,7 +13,10 @@
   }
 
   .animate-fade-in {
-    animation: pulse-inverse 500ms;
+    animation: pulse-inverse 600ms;
+  }
+  .animate-fade-in-long {
+    animation: pulse-inverse 800ms;
   }
 }
 

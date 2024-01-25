@@ -18,8 +18,6 @@ const appendSkeletonFrame = (target: HTMLElement) => {
     <div class="flex flex-col gap-4 justify-center items-center w-full h-full animate-fade-in">
       <div class="skeleton bg-opacity-100 h-4 w-full"></div>
       <div class="skeleton bg-opacity-90 h-4 w-full"></div>
-      <div class="skeleton bg-opacity-80 h-4 w-full"></div>
-      <div class="skeleton bg-opacity-75 h-4 w-full"></div>
       <div class="skeleton bg-opacity-70 h-4 w-full"></div>
       <div class="skeleton bg-opacity-60 h-4 w-full"></div>
       <div class="skeleton bg-opacity-55 h-4 w-full"></div>
@@ -33,6 +31,24 @@ const appendSkeletonFrame = (target: HTMLElement) => {
       <div class="skeleton bg-opacity-15 h-4 w-full"></div>
       <div class="skeleton bg-opacity-0 h-4 w-full"></div>
     </div>
+  `;
+};
+
+//  TODO: Maybe put the server table into a isomorphic component to share style ?
+const appendSkeletonTable = (target: HTMLElement) => {
+  const rowsArray = Array(10).fill(0);
+  const cellsArray = Array(target.getElementsByTagName("tr")[0].getElementsByTagName("th").length).fill(0);
+
+  target.innerHTML = `
+    <tbody class="">
+      ${rowsArray
+        .map(
+          (_, i) =>
+            `<tr class="bg-opacity-50 animate-fade-in">${cellsArray
+              .map(() => `<th><div class="skeleton bg-opacity-${100 - i * 10} h-4 w-full"></div></th>`)
+              .join("")}</tr>`,
+        )
+        .join("")}</tbody>
   `;
 };
 
@@ -52,12 +68,18 @@ window.onload = () => {
       return;
     }
 
+    if (e.detail.target.tagName === "TBODY") {
+      appendSkeletonTable(e.detail.target);
+      return;
+    }
+
     const currentPath = window.location.pathname;
     const pathRequested = e.detail.requestConfig.path.split("?")[0];
 
     if (pathRequested !== currentPath) {
       const target = (e?.detail.target.id ? e.detail.target : document.getElementById("main")) as HTMLElement;
       appendSkeletonFrame(target);
+      return;
     }
   });
 

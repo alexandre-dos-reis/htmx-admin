@@ -17,7 +17,9 @@ export interface ListProps extends JSX.HtmlTableTag {
 const hxProps = {
   "hx-headers": JSON.stringify({ [HEADERS_CONSTANTS.renderFragment]: "true" }),
   "hx-replace-url": "true",
-  "hx-target": "#list",
+  "hx-target": "#table-body",
+  "hx-select": "#table-body",
+  "hx-on-click": "handleSort(this)",
 };
 
 export const List = ({ rows, headers, totalPages, currentPage, enableFooter, ...p }: ListProps) => {
@@ -27,12 +29,12 @@ export const List = ({ rows, headers, totalPages, currentPage, enableFooter, ...
     <div id="list">
       <table class={cn("relative table border-separate border-spacing-0")} {...p}>
         <thead class="overflow-hidden">
-          <ColumnsTitle headers={headers} />
+          <Headers headers={headers} />
         </thead>
-        <tbody>{rows}</tbody>
+        <tbody id="table-body">{rows}</tbody>
         {enableFooter ? (
           <tfoot>
-            <ColumnsTitle headers={headers} />
+            <Headers headers={headers} />
           </tfoot>
         ) : null}
       </table>
@@ -45,52 +47,80 @@ interface HeaderProps {
   headers: Array<{ label: string; queryName: string; disabledSorting?: boolean }>;
 }
 
-const ColumnsTitle = ({ headers }: HeaderProps) => {
+const Headers = ({ headers }: HeaderProps) => {
   const ctx = getContext();
   const query = ctx?.query as TableQuery;
+  // const script = "on click call handleSort(event.target)";
 
   return (
     <tr class="sticky top-[70px] z-[1] bg-base-200 border-b-2 border-b-black">
-      {headers.map((h) => (
-        <th
-          class={cn(
-            !h.disabledSorting && "cursor-pointer hover:bg-base-300",
-            query?.orderByName === h.queryName && "bg-base-300",
-          )}
-        >
-          <div class="flex justify-between">
-            {h.disabledSorting ? (
-              <span>{h.label}</span>
-            ) : (
-              <div
-                class="flex gap-3 w-full"
-                {...hxProps}
-                hx-get={`${ctx?.path}?${qs.stringify({
-                  ...query,
-                  orderByName: h.queryName,
-                  orderByDir: query?.orderByName === h.queryName && query.orderByDir === "asc" ? "desc" : "asc",
-                })}`}
-              >
-                <span>
-                  {query?.orderByName !== h.queryName ? (
-                    <Sort class="fill-neutral-500" />
-                  ) : query?.orderByName === h.queryName && query.orderByDir === "desc" ? (
-                    <SortDown class="fill-neutral-500" />
-                  ) : (
-                    <SortUp class="fill-neutral-500" />
-                  )}
-                </span>
-                <span>{h.label}</span>
-              </div>
-            )}
-            <XMark
-              class={cn("z-[1] invisible fill-neutral-500", query?.orderByName === h.queryName && "visible")}
-              {...hxProps}
-              hx-get={ctx?.path}
-            />
-          </div>
-        </th>
-      ))}
+      {headers.map((h) => {
+        const isSort = query?.orderByName === h.queryName;
+        return (
+          <>
+            <th
+              is="sortable-cell"
+              state="unsorted"
+              class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300")}
+            ></th>
+            {/* <th class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300", isSort && "bg-base-300")}> */}
+            {/*   <div data-sort-group={h.queryName} class={cn("flex justify-between", !h.disabledSorting && "sort-group")}> */}
+            {/*     {h.disabledSorting ? ( */}
+            {/*       <span>{h.label}</span> */}
+            {/*     ) : ( */}
+            {/*       <> */}
+            {/*         <div */}
+            {/*           class={cn("unsorted flex justify-between gap-3 w-full", isSort && "hidden")} */}
+            {/*           {...hxProps} */}
+            {/*           hx-get={`${ctx?.path}?${qs.stringify({ */}
+            {/*             ...query, */}
+            {/*             orderByName: h.queryName, */}
+            {/*             orderByDir: "asc", */}
+            {/*           })}`} */}
+            {/*         > */}
+            {/*           <Sort class={cn("fill-neutral-500")} /> */}
+            {/*           <span class="w-full">{h.label}</span> */}
+            {/*         </div> */}
+            {/*         <div */}
+            {/*           class={cn( */}
+            {/*             "sorted-up flex justify-between gap-3 w-full", */}
+            {/*             (!isSort || (isSort && query.orderByDir === "desc")) && "hidden", */}
+            {/*           )} */}
+            {/*           {...hxProps} */}
+            {/*           hx-get={`${ctx?.path}?${qs.stringify({ */}
+            {/*             ...query, */}
+            {/*             orderByName: h.queryName, */}
+            {/*             orderByDir: "desc", */}
+            {/*           })}`} */}
+            {/*         > */}
+            {/*           <SortUp class={cn("fill-neutral-500")} /> */}
+            {/*           <span class="w-full">{h.label}</span> */}
+            {/*         </div> */}
+            {/*         <div */}
+            {/*           class={cn( */}
+            {/*             "sorted-down flex justify-between gap-3 w-full", */}
+            {/*             (!isSort || (isSort && query.orderByDir === "asc")) && "hidden", */}
+            {/*           )} */}
+            {/*           {...hxProps} */}
+            {/*           hx-get={`${ctx?.path}?${qs.stringify({ */}
+            {/*             ...query, */}
+            {/*             orderByName: h.queryName, */}
+            {/*             orderByDir: "asc", */}
+            {/*           })}`} */}
+            {/*         > */}
+            {/*           <SortDown class={cn("fill-neutral-500")} /> */}
+            {/*           <span class="w-full">{h.label}</span> */}
+            {/*         </div> */}
+            {/*         <div {...hxProps} class={cn("reset-sort z-[1]", !isSort && "hidden")} hx-get={ctx?.path}> */}
+            {/*           <XMark class={cn("fill-neutral-500")} /> */}
+            {/*         </div> */}
+            {/*       </> */}
+            {/*     )} */}
+            {/*   </div> */}
+            {/* </th> */}
+          </>
+        );
+      })}
     </tr>
   );
 };
