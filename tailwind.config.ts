@@ -23,6 +23,12 @@ export default {
     {
       pattern: /bg-opacity-*/,
     },
+    {
+      pattern: /w-*/,
+    },
+    {
+      pattern: /h-*/,
+    },
   ],
   theme: {
     extend: {},

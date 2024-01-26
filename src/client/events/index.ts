@@ -37,15 +37,26 @@ const appendSkeletonFrame = (target: HTMLElement) => {
 //  TODO: Maybe put the server table into a isomorphic component to share style ?
 const appendSkeletonTable = (target: HTMLElement) => {
   const rowsArray = Array(10).fill(0);
-  const cellsArray = Array(target.getElementsByTagName("tr")[0].getElementsByTagName("th").length).fill(0);
+  const cellElements = Array.from(target.getElementsByTagName("tr")[0].getElementsByTagName("th"));
+  const cellsDimensions = cellElements.map((c) => ({
+    height: c.offsetHeight,
+    width: c.offsetWidth,
+    classFirstChild: c.firstChild?.nodeName === "DIV" ? c.children[0].className : undefined,
+  }));
+  // console.log({ cellsDimensions });
 
   target.innerHTML = `
     <tbody class="">
       ${rowsArray
         .map(
           (_, i) =>
-            `<tr class="bg-opacity-50 animate-fade-in">${cellsArray
-              .map(() => `<th><div class="skeleton bg-opacity-${100 - i * 10} h-4 w-full"></div></th>`)
+            `<tr class="bg-opacity-50 animate-fade-in ">${cellsDimensions
+              .map(
+                (c) =>
+                  `<th class="h-[${c.height}px] w-[${c.width}px]">
+                      <div class="skeleton bg-opacity-${100 - i * 10} w-[${c.width}px]">c</div>
+                  </th>`,
+              )
               .join("")}</tr>`,
         )
         .join("")}</tbody>

@@ -19,7 +19,6 @@ const hxProps = {
   "hx-replace-url": "true",
   "hx-target": "#table-body",
   "hx-select": "#table-body",
-  "hx-on-click": "handleSort(this)",
 };
 
 export const List = ({ rows, headers, totalPages, currentPage, enableFooter, ...p }: ListProps) => {
@@ -58,11 +57,29 @@ const Headers = ({ headers }: HeaderProps) => {
         const isSort = query?.orderByName === h.queryName;
         return (
           <>
-            <th
-              is="sortable-cell"
-              state="unsorted"
-              class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300")}
-            ></th>
+            {h.disabledSorting ? (
+              <th class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300")}>{h.label}</th>
+            ) : (
+              <th
+                is="sortable-cell"
+                label={h.label}
+                class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300")}
+                direction="unsorted"
+                htmx-unsorted-path={ctx?.path}
+                htmx-sorted-up-path={`${ctx?.path}?${qs.stringify({
+                  ...query,
+                  orderByName: h.queryName,
+                  orderByDir: "asc",
+                })}`}
+                htmx-sorted-down-path={`${ctx?.path}?${qs.stringify({
+                  ...query,
+                  orderByName: h.queryName,
+                  orderByDir: "desc",
+                })}`}
+              >
+                {h.label}
+              </th>
+            )}
             {/* <th class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300", isSort && "bg-base-300")}> */}
             {/*   <div data-sort-group={h.queryName} class={cn("flex justify-between", !h.disabledSorting && "sort-group")}> */}
             {/*     {h.disabledSorting ? ( */}
@@ -72,11 +89,12 @@ const Headers = ({ headers }: HeaderProps) => {
             {/*         <div */}
             {/*           class={cn("unsorted flex justify-between gap-3 w-full", isSort && "hidden")} */}
             {/*           {...hxProps} */}
-            {/*           hx-get={`${ctx?.path}?${qs.stringify({ */}
-            {/*             ...query, */}
-            {/*             orderByName: h.queryName, */}
-            {/*             orderByDir: "asc", */}
-            {/*           })}`} */}
+            {/* hx-get= */}
+            {/* {`${ctx?.path}?${qs.stringify({ */}
+            {/*   ...query, */}
+            {/*   orderByName: h.queryName, */}
+            {/*   orderByDir: "asc", */}
+            {/* })}`} */}
             {/*         > */}
             {/*           <Sort class={cn("fill-neutral-500")} /> */}
             {/*           <span class="w-full">{h.label}</span> */}
@@ -87,11 +105,12 @@ const Headers = ({ headers }: HeaderProps) => {
             {/*             (!isSort || (isSort && query.orderByDir === "desc")) && "hidden", */}
             {/*           )} */}
             {/*           {...hxProps} */}
-            {/*           hx-get={`${ctx?.path}?${qs.stringify({ */}
-            {/*             ...query, */}
-            {/*             orderByName: h.queryName, */}
-            {/*             orderByDir: "desc", */}
-            {/*           })}`} */}
+            {/* hx-get= */}
+            {/* {`${ctx?.path}?${qs.stringify({ */}
+            {/*   ...query, */}
+            {/*   orderByName: h.queryName, */}
+            {/*   orderByDir: "desc", */}
+            {/* })}`} */}
             {/*         > */}
             {/*           <SortUp class={cn("fill-neutral-500")} /> */}
             {/*           <span class="w-full">{h.label}</span> */}
