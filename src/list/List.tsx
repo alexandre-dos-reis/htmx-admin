@@ -81,63 +81,6 @@ const Headers = ({ headers }: HeaderProps) => {
                 {h.label}
               </th>
             )}
-            {/* <th class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300", isSort && "bg-base-300")}> */}
-            {/*   <div data-sort-group={h.queryName} class={cn("flex justify-between", !h.disabledSorting && "sort-group")}> */}
-            {/*     {h.disabledSorting ? ( */}
-            {/*       <span>{h.label}</span> */}
-            {/*     ) : ( */}
-            {/*       <> */}
-            {/*         <div */}
-            {/*           class={cn("unsorted flex justify-between gap-3 w-full", isSort && "hidden")} */}
-            {/*           {...hxProps} */}
-            {/* hx-get= */}
-            {/* {`${ctx?.path}?${qs.stringify({ */}
-            {/*   ...query, */}
-            {/*   orderByName: h.queryName, */}
-            {/*   orderByDir: "asc", */}
-            {/* })}`} */}
-            {/*         > */}
-            {/*           <Sort class={cn("fill-neutral-500")} /> */}
-            {/*           <span class="w-full">{h.label}</span> */}
-            {/*         </div> */}
-            {/*         <div */}
-            {/*           class={cn( */}
-            {/*             "sorted-up flex justify-between gap-3 w-full", */}
-            {/*             (!isSort || (isSort && query.orderByDir === "desc")) && "hidden", */}
-            {/*           )} */}
-            {/*           {...hxProps} */}
-            {/* hx-get= */}
-            {/* {`${ctx?.path}?${qs.stringify({ */}
-            {/*   ...query, */}
-            {/*   orderByName: h.queryName, */}
-            {/*   orderByDir: "desc", */}
-            {/* })}`} */}
-            {/*         > */}
-            {/*           <SortUp class={cn("fill-neutral-500")} /> */}
-            {/*           <span class="w-full">{h.label}</span> */}
-            {/*         </div> */}
-            {/*         <div */}
-            {/*           class={cn( */}
-            {/*             "sorted-down flex justify-between gap-3 w-full", */}
-            {/*             (!isSort || (isSort && query.orderByDir === "asc")) && "hidden", */}
-            {/*           )} */}
-            {/*           {...hxProps} */}
-            {/*           hx-get={`${ctx?.path}?${qs.stringify({ */}
-            {/*             ...query, */}
-            {/*             orderByName: h.queryName, */}
-            {/*             orderByDir: "asc", */}
-            {/*           })}`} */}
-            {/*         > */}
-            {/*           <SortDown class={cn("fill-neutral-500")} /> */}
-            {/*           <span class="w-full">{h.label}</span> */}
-            {/*         </div> */}
-            {/*         <div {...hxProps} class={cn("reset-sort z-[1]", !isSort && "hidden")} hx-get={ctx?.path}> */}
-            {/*           <XMark class={cn("fill-neutral-500")} /> */}
-            {/*         </div> */}
-            {/*       </> */}
-            {/*     )} */}
-            {/*   </div> */}
-            {/* </th> */}
           </>
         );
       })}
@@ -157,6 +100,8 @@ const Pagination = (p: { pages: number[]; currentPage: number }) => {
             class={cn("join-item btn", px === p.currentPage && "btn-primary")}
             {...hxProps}
             hx-get={`${ctx?.path}?${qs.stringify({ ...query, page: px })}`}
+            // _="on click take .btn-primary from .join-item for me"
+            // TODO:send over the pagination when sort is clicked, I don't want to handle this...
           >
             {px}
           </button>
