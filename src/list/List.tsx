@@ -3,6 +3,7 @@ import qs from "qs";
 import { Sort, SortUp, SortDown, XMark } from "~/components/svg/*";
 import { cn } from "~/utils";
 import { HEADERS_CONSTANTS } from "~/config/constants";
+import { when } from "ts-pattern/dist/patterns";
 
 export type TableQuery = { orderByName?: string; orderByDir?: "desc" | "asc"; page?: number } | undefined;
 
@@ -49,23 +50,23 @@ interface HeaderProps {
 const Headers = ({ headers }: HeaderProps) => {
   const ctx = getContext();
   const query = ctx?.query as TableQuery;
-  // const script = "on click call handleSort(event.target)";
 
   return (
     <tr class="sticky top-[70px] z-[1] bg-base-200 border-b-2 border-b-black">
       {headers.map((h) => {
         const isSort = query?.orderByName === h.queryName;
+
         return (
           <>
             {h.disabledSorting ? (
               <th class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300")}>{h.label}</th>
             ) : (
               <th
+                class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300")}
                 is="sortable-cell"
                 id={`sortable-cell-${h.queryName}`}
+                direction={isSort ? (query?.orderByDir === "asc" ? "sorted-up" : "sorted-down") : "unsorted"}
                 label={h.label}
-                class={cn("sortable-cell", !h.disabledSorting && "cursor-pointer hover:bg-base-300")}
-                direction="unsorted"
                 htmx-unsorted-path={ctx?.path}
                 htmx-sorted-up-path={`${ctx?.path}?${qs.stringify({
                   ...query,

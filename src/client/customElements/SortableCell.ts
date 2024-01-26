@@ -39,7 +39,7 @@ customElements.define(
     }
 
     resetOtherSortableCells() {
-      Array.from(document.getElementsByClassName("sortable-cell")).forEach((c) => {
+      Array.from(document.querySelectorAll('th[is="sortable-cell"]')).forEach((c) => {
         if (c.id !== this.id) {
           c.setAttribute("direction", "unsorted");
         }
