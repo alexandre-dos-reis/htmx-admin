@@ -62,8 +62,9 @@ const Headers = ({ headers }: HeaderProps) => {
             ) : (
               <th
                 is="sortable-cell"
+                id={`sortable-cell-${h.queryName}`}
                 label={h.label}
-                class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300")}
+                class={cn("sortable-cell", !h.disabledSorting && "cursor-pointer hover:bg-base-300")}
                 direction="unsorted"
                 htmx-unsorted-path={ctx?.path}
                 htmx-sorted-up-path={`${ctx?.path}?${qs.stringify({

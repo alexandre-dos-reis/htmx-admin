@@ -43,7 +43,6 @@ const appendSkeletonTable = (target: HTMLElement) => {
     width: c.offsetWidth,
     classFirstChild: c.firstChild?.nodeName === "DIV" ? c.children[0].className : undefined,
   }));
-  // console.log({ cellsDimensions });
 
   target.innerHTML = `
     <tbody class="">
@@ -78,11 +77,11 @@ window.onload = () => {
     if (isPreloadLink) {
       return;
     }
-
-    if (e.detail.target.tagName === "TBODY") {
-      appendSkeletonTable(e.detail.target);
-      return;
-    }
+    // working but table flickers on sort, because skeleton don't preserve cell width. For now disabling skeleton for table"
+    // if (e.detail.target.tagName === "TBODY") {
+    //   appendSkeletonTable(e.detail.target);
+    //   return;
+    // }
 
     const currentPath = window.location.pathname;
     const pathRequested = e.detail.requestConfig.path.split("?")[0];

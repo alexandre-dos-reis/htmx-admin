@@ -3,11 +3,7 @@ import { Handler } from "~/config/decorateRequest";
 
 export const OmniSearch = () => {
   return (
-    <div id="omnisearch" class="form-control relative indicator">
-      <span
-        id="omnisearch-loader"
-        class="indicator-item indicator-bottom indicator-center loading loading-dots loading-lg htmx-indicator"
-      ></span>
+    <div id="omnisearch" class="form-control relative">
       <input
         type="text"
         id="omnisearch-input"

@@ -9,7 +9,6 @@ export class SortableCell extends HTMLTableCellElement {
   static observedAttributes = [directionAttr];
 
   direction: Direction = "unsorted";
-  url: string = "";
 
   constructor() {
     super();
@@ -21,15 +20,38 @@ export class SortableCell extends HTMLTableCellElement {
     this.attachListener();
   }
 
-  callHtmx(direction?: Direction) {
-    const localDir = direction ?? this.direction;
-    const url = this.getAttribute(`htmx-${localDir}-path`);
+  updateUrl(url: string, replace?: boolean) {
+    if (replace) {
+      history.replaceState({}, "", url);
+    } else {
+      history.pushState({}, "", url);
+    }
+  }
 
-    window.htmx.ajax("GET", url as string, {
-      target: "#table-body",
-      select: "#table-body",
-      swap: "outerHTML",
-      headers: { [HEADERS_CONSTANTS.renderFragment]: true },
+  getUrl(direction?: Direction) {
+    const localDir = direction ?? this.direction;
+    return this.getAttribute(`htmx-${localDir}-path`)!;
+  }
+
+  callHtmx(direction?: Direction) {
+    const url = this.getUrl(direction);
+    window.htmx
+      .ajax("GET", url as string, {
+        target: "#table-body",
+        select: "#table-body",
+        swap: "outerHTML",
+        headers: { [HEADERS_CONSTANTS.renderFragment]: true },
+      })
+      .then(() => {
+        this.updateUrl(url);
+      });
+  }
+
+  resetOtherSortableCell() {
+    Array.from(document.getElementsByClassName("sortable-cell")).forEach((c) => {
+      if (c.id !== this.id) {
+        c.setAttribute("direction", "unsorted");
+      }
     });
   }
 
@@ -38,12 +60,15 @@ export class SortableCell extends HTMLTableCellElement {
       match(this.direction)
         .with("sorted-up", () => {
           this.setAttribute(directionAttr, "sorted-down");
+          this.resetOtherSortableCell();
         })
         .with("sorted-down", () => {
           this.setAttribute(directionAttr, "sorted-up");
+          this.resetOtherSortableCell();
         })
         .with("unsorted", () => {
           this.setAttribute(directionAttr, "sorted-up");
+          this.resetOtherSortableCell();
         });
       this.callHtmx();
     });
@@ -56,6 +81,7 @@ export class SortableCell extends HTMLTableCellElement {
 
   onDirectionChanges(_: Direction, newValue: Direction) {
     this.direction = newValue;
+    this.updateUrl(this.getUrl(newValue), true);
 
     if (newValue !== "unsorted") {
       this.classList.add("bg-base-300");

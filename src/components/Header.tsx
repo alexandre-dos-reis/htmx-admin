@@ -18,6 +18,7 @@ export const Header = () => {
         </Link>
       </div>
       <div class="gap-x-5 flex items-center">
+        <span class="text-primary indicator-item indicator-bottom indicator-center loading loading-spinner loading-md htmx-indicator"></span>
         <OmniSearch />
         <ThemeController />
         <div class="dropdown dropdown-end">
