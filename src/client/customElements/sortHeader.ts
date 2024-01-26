@@ -20,21 +20,10 @@ export class SortableCell extends HTMLTableCellElement {
     this.attachListener();
   }
 
-  updateUrl(url: string, replace?: boolean) {
-    if (replace) {
-      history.replaceState({}, "", url);
-    } else {
-      history.pushState({}, "", url);
-    }
-  }
-
-  getUrl(direction?: Direction) {
-    const localDir = direction ?? this.direction;
-    return this.getAttribute(`htmx-${localDir}-path`)!;
-  }
-
   callHtmx(direction?: Direction) {
-    const url = this.getUrl(direction);
+    const localDir = direction ?? this.direction;
+    const url = this.getAttribute(`htmx-${localDir}-path`);
+
     window.htmx
       .ajax("GET", url as string, {
         target: "#table-body",
@@ -43,7 +32,8 @@ export class SortableCell extends HTMLTableCellElement {
         headers: { [HEADERS_CONSTANTS.renderFragment]: true },
       })
       .then(() => {
-        this.updateUrl(url);
+        // update url
+        history.pushState({}, "", url);
       });
   }
 
@@ -81,7 +71,6 @@ export class SortableCell extends HTMLTableCellElement {
 
   onDirectionChanges(_: Direction, newValue: Direction) {
     this.direction = newValue;
-    this.updateUrl(this.getUrl(newValue), true);
 
     if (newValue !== "unsorted") {
       this.classList.add("bg-base-300");
