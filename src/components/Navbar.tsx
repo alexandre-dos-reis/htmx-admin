@@ -15,7 +15,7 @@ const NavLink = ({ href, children, class: classname, icon, ...props }: JSX.HtmlA
           : cn(
               "w-full text-center nav-link link no-underline px-7 py-2 mb-2 rounded",
               isCurrent ? "text-primary-content bg-primary" : "text-neutral-content bg-neutral-700",
-              icon ? "flex justify-center items-center gap-3" : "italic",
+              icon ? "flex justify-center items-center gap-3" : "italic"
             )
       }
       preload="mouseover"
@@ -32,6 +32,7 @@ const NavLink = ({ href, children, class: classname, icon, ...props }: JSX.HtmlA
           take .bg-primary from .nav-link for me then
           take .text-primary-content from .nav-link for me
         "
+      // create a client func to handle this behavior and call it from here !
     >
       {icon ? (
         <>

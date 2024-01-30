@@ -66,4 +66,27 @@ window.onload = () => {
       appendSkeletonFrame(document.getElementById("main") as HTMLElement);
     }
   });
+
+  //  update navbar ...
+  window.addEventListener("popstate", function (event) {
+    if (event.state) {
+      Array.from(document.getElementById("navbar")!.querySelectorAll("a")).map((a) => {
+        const href = a.getAttribute("hx-get")!;
+
+        const path = window.location.pathname;
+        const isCurrent = href === "/" ? path === href : path.startsWith(href || "");
+        if (isCurrent) {
+          a.classList.add("text-primary-content");
+          a.classList.add("bg-primary");
+          a.classList.remove("text-neutral-content");
+          a.classList.remove("bg-neutral-700");
+        } else {
+          a.classList.remove("text-primary-content");
+          a.classList.remove("bg-primary");
+          a.classList.add("text-neutral-content");
+          a.classList.add("bg-neutral-700");
+        }
+      });
+    }
+  });
 };
