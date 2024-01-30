@@ -2,7 +2,7 @@ import { getContext } from "~/config/globalStorages";
 import qs from "qs";
 import { Sort, SortUp, SortDown, XMark } from "~/components/svg/*";
 import { cn } from "~/utils";
-import { HEADERS_CONSTANTS } from "~/config/constants";
+import { getHxHeaders } from "~/config/helpers";
 
 export type TableQuery = { orderByName?: string; orderByDir?: "desc" | "asc"; page?: number } | undefined;
 
@@ -15,7 +15,7 @@ export interface ListProps extends JSX.HtmlTableTag {
 }
 
 const hxProps = {
-  "hx-headers": JSON.stringify({ [HEADERS_CONSTANTS.renderFragment]: "true" }),
+  ...getHxHeaders({ renderFragment: true }),
   "hx-replace-url": "true",
   "hx-target": "#list",
 };
