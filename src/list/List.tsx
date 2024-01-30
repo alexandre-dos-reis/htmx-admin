@@ -51,46 +51,43 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
 
   return (
     <tr class="sticky top-[70px] z-[1] bg-base-200 border-b-2 border-b-black">
-      {headers.map((h) => (
-        <th
-          class={cn(
-            !h.disabledSorting && "cursor-pointer hover:bg-base-300",
-            query?.orderByName === h.queryName && "bg-base-300",
-          )}
-        >
-          <div class="flex justify-between">
-            {h.disabledSorting ? (
-              <span>{h.label}</span>
-            ) : (
-              <div
-                class="flex gap-3 w-full"
-                {...hxProps}
-                hx-get={`${ctx?.path}?${qs.stringify({
-                  ...query,
-                  orderByName: h.queryName,
-                  orderByDir: query?.orderByName === h.queryName && query.orderByDir === "asc" ? "desc" : "asc",
-                })}`}
-              >
-                <span>
-                  {query?.orderByName !== h.queryName ? (
-                    <Sort class="fill-neutral-500" />
-                  ) : query?.orderByName === h.queryName && query.orderByDir === "desc" ? (
-                    <SortDown class="fill-neutral-500" />
-                  ) : (
-                    <SortUp class="fill-neutral-500" />
-                  )}
-                </span>
-                <span>{h.label}</span>
-              </div>
-            )}
-            <XMark
-              class={cn("z-[1] invisible fill-neutral-500", query?.orderByName === h.queryName && "visible")}
-              {...hxProps}
-              hx-get={ctx?.path}
-            />
-          </div>
-        </th>
-      ))}
+      {headers.map((h) => {
+        const isSorted = query?.orderByName === h.queryName;
+        const isSortedUp = isSorted && query.orderByDir === "asc";
+        const isSortedDown = isSorted && query.orderByDir === "desc";
+        return (
+          <th class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300", isSorted && "bg-base-300")}>
+            <div class="flex">
+              {h.disabledSorting ? (
+                <div>{h.label}</div>
+              ) : (
+                <>
+                  <div
+                    class="flex gap-3 items-center w-full"
+                    {...hxProps}
+                    hx-get={`${ctx?.path}?${qs.stringify({
+                      ...query,
+                      orderByName: h.queryName,
+                      orderByDir: isSortedUp ? "desc" : "asc",
+                    })}`}
+                  >
+                    <div class="flex flex-col justify-center items-center h-full">
+                      <SortUp class={cn("fill-neutral-500 relative top-[8px]", isSortedDown && "invisible")} />
+                      <SortDown class={cn("fill-neutral-500 relative -top-[8px]", isSortedUp && "invisible")} />
+                    </div>
+                    <div class="w-full">{h.label}</div>
+                  </div>
+                  <XMark
+                    class={cn("z-[1] m-3 fill-neutral-500", !isSorted && "invisible")}
+                    {...hxProps}
+                    hx-get={ctx?.path}
+                  />
+                </>
+              )}
+            </div>
+          </th>
+        );
+      })}
     </tr>
   );
 };

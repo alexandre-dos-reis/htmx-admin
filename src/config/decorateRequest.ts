@@ -69,34 +69,36 @@ const decorateBase = ({ request: { headers, method }, set, path }: Context) => {
         [appEvent]: [event],
       });
     },
+
+    get notifyAndRedirect() {
+      return ({ message, to }: { to: string; message: string }) => {
+        this.redirectTo(to);
+        this.sendEvent({ message, name: "notify", level: "success" });
+      };
+    },
+
+    get notifyAnError() {
+      return (message?: string) => {
+        this.sendEvent({
+          message: message ?? "A problem occured, please try again later !",
+          name: "notify",
+          level: "error",
+        });
+      };
+    },
+
+    get notify() {
+      return ({ message, level }: { message: string; level: Extract<AppEvent, { name: "notify" }>["level"] }) => {
+        this.sendEvent({ message, name: "notify", level });
+      };
+    },
   };
 };
 
-const decorateExtended = ({ sendEvent, redirectTo }: Context & ReturnType<typeof decorateBase>) => {
-  return {
-    notifyAndRedirect: ({ message, to }: { to: string; message: string }) => {
-      redirectTo(to);
-      sendEvent({ message, name: "notify", level: "success" });
-    },
-    notifyAnError: (message?: string) => {
-      sendEvent({
-        message: message ?? "A problem occured, please try again later !",
-        name: "notify",
-        level: "error",
-      });
-    },
-    notify: ({ message, level }: { message: string; level: Extract<AppEvent, { name: "notify" }>["level"] }) => {
-      sendEvent({ message, name: "notify", level });
-    },
-  };
-};
+export const decorateRequest = new Elysia({ name: "context-decorated" }).derive((ctx) => decorateBase(ctx));
 
-export const decorateRequest = new Elysia({ name: "context-decorated" })
-  .derive((ctx) => decorateBase(ctx))
-  .derive((ctx) => decorateExtended(ctx));
-
-export type ContextDecorated = ReturnType<typeof decorateBase> & ReturnType<typeof decorateExtended> & Context;
+export type ContextDecorated = ReturnType<typeof decorateBase> & Context;
 
 export type Handler = (
-  ctx: Omit<ContextDecorated, "params"> & { params: Record<string, string> },
+  ctx: Omit<ContextDecorated, "params"> & { params: Record<string, string> }
 ) => MaybePromise<JSX.Element | void>;

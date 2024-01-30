@@ -12,12 +12,12 @@ import { api } from "./api";
 export const app = new Elysia()
   .use(decorateRequest)
   .use(globals)
-  .onError(({ code, error, notifyAnError }) => {
-    notifyAnError(error.message);
-  })
   .use(staticPlugin({ assets: "public", prefix: "public" }))
-  .use(api)
+  // .onError(({ isHxBoost }) => {
+  //   // notifyAnError(error.message);
+  // })
   .use(html())
+  .use(api)
   .use(fragments)
   .use(customers)
   .all("/", () => <Layout>Home</Layout>)
