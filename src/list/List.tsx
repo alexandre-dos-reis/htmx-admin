@@ -80,7 +80,7 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
                          ${
                            !isSorted
                              ? `add .${sortedBg} to the closest <th/> then add .${invisible} to #${sortDownId}`
-                             : `toggle .${invisible} on #${sortDownId} then toggle .${invisible} on #${sortUpId}`
+                             : `toggle .${invisible} on [#${sortDownId},#${sortUpId}]`
                          }
                       `}
                   >
@@ -97,13 +97,12 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
                     <div class="w-full">{h.label}</div>
                   </div>
                   <XMark
-                    class={cn("z-[1] m-3 fill-neutral-500", !isSorted && invisible)}
+                    class={cn("z-[1] m-3 fill-neutral-500 w-4 h-4", !isSorted && invisible)}
                     {...hxProps}
                     hx-get={ctx?.path}
                     _={`on click 
                           remove .${sortedBg} from the closest <th/> then 
-                          remove .${invisible} from #${sortDownId} then 
-                          remove .${invisible} from #${sortUpId} then
+                          remove .${invisible} from [#${sortDownId},#${sortDownId}] then 
                           add .${invisible} to me
                       `}
                   />
