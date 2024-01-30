@@ -55,8 +55,14 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
         const isSorted = query?.orderByName === h.queryName;
         const isSortedUp = isSorted && query.orderByDir === "asc";
         const isSortedDown = isSorted && query.orderByDir === "desc";
+        const sortedBg = "bg-base-300";
+
+        const sortUpId = `${h.queryName}-sorted-up`;
+        const sortDownId = `${h.queryName}-sorted-down`;
+        const invisible = "invisible";
+
         return (
-          <th class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300", isSorted && "bg-base-300")}>
+          <th class={cn(!h.disabledSorting && "cursor-pointer hover:bg-base-300", isSorted && sortedBg)}>
             <div class="flex">
               {h.disabledSorting ? (
                 <div>{h.label}</div>
@@ -70,17 +76,36 @@ const ColumnsTitle = ({ headers }: HeaderProps) => {
                       orderByName: h.queryName,
                       orderByDir: isSortedUp ? "desc" : "asc",
                     })}`}
+                    _={`on click 
+                         ${
+                           !isSorted
+                             ? `add .${sortedBg} to the closest <th/> then add .${invisible} to #${sortDownId}`
+                             : `toggle .${invisible} on #${sortDownId} then toggle .${invisible} on #${sortUpId}`
+                         }
+                      `}
                   >
                     <div class="flex flex-col justify-center items-center h-full">
-                      <SortUp class={cn("fill-neutral-500 relative top-[8px]", isSortedDown && "invisible")} />
-                      <SortDown class={cn("fill-neutral-500 relative -top-[8px]", isSortedUp && "invisible")} />
+                      <SortUp
+                        id={sortUpId}
+                        class={cn("fill-neutral-500 relative top-[8px]", isSortedDown && invisible)}
+                      />
+                      <SortDown
+                        id={sortDownId}
+                        class={cn("sorted-down fill-neutral-500 relative -top-[8px]", isSortedUp && invisible)}
+                      />
                     </div>
                     <div class="w-full">{h.label}</div>
                   </div>
                   <XMark
-                    class={cn("z-[1] m-3 fill-neutral-500", !isSorted && "invisible")}
+                    class={cn("z-[1] m-3 fill-neutral-500", !isSorted && invisible)}
                     {...hxProps}
                     hx-get={ctx?.path}
+                    _={`on click 
+                          remove .${sortedBg} from the closest <th/> then 
+                          remove .${invisible} from #${sortDownId} then 
+                          remove .${invisible} from #${sortUpId} then
+                          add .${invisible} to me
+                      `}
                   />
                 </>
               )}
